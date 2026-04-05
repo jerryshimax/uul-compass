@@ -9,7 +9,7 @@ const workstreams = [
   { name: "Finance Integration", color: "#ef4444", taskCount: 12, completed: 1 },
   { name: "Operations Consolidation", color: "#f97316", taskCount: 10, completed: 0 },
   { name: "Sales Engine", color: "#3b82f6", taskCount: 8, completed: 1 },
-  { name: "Brand & Marketing", color: "#8b5cf6", taskCount: 7, completed: 2 },
+  { name: "Brand & Marketing", color: "#8b5cf6", taskCount: 12, completed: 3 },
   { name: "Technology & AI", color: "#06b6d4", taskCount: 9, completed: 0 },
   { name: "Organization & HR", color: "#22c55e", taskCount: 6, completed: 0 },
 ];
@@ -32,9 +32,14 @@ const demoTasks: TaskData[] = [
   { id: "12", title: "Build DataMine API for customer freight history", status: "todo", priority: "medium", assignee: { name: "Jerry Shi", initials: "JS" }, workstream: "Sales", workstreamColor: "#3b82f6" },
   { id: "13", title: "Foxconn meeting prep (Steve Zhi IPP advisory)", status: "todo", priority: "medium", assignee: { name: "Jerry Shi", initials: "JS" }, dueDate: "Apr 13", workstream: "Sales", workstreamColor: "#3b82f6" },
   // Brand & Marketing
-  { id: "14", title: "Corporate deck skeleton memo for Ben Fogarty", status: "in_progress", priority: "high", assignee: { name: "Jerry Shi", initials: "JS" }, dueDate: "Apr 2", workstream: "Marketing", workstreamColor: "#8b5cf6" },
+  { id: "14", title: "Brand Narrative Memo v1 (Master Marketing Memo) — North Star for all marketing", status: "done", priority: "critical", assignee: { name: "Jerry Shi", initials: "JS" }, dueDate: "Apr 3", workstream: "Marketing", workstreamColor: "#8b5cf6" },
   { id: "15", title: "Ben Fogarty DocuSign + kickoff", status: "done", priority: "high", assignee: { name: "Jerry Shi", initials: "JS" }, workstream: "Marketing", workstreamColor: "#8b5cf6" },
-  { id: "16", title: "Lock key stats for all marketing materials", status: "todo", priority: "medium", workstream: "Marketing", workstreamColor: "#8b5cf6" },
+  { id: "14b", title: "Mid-week deck review with Ben", status: "todo", priority: "high", assignee: { name: "Jerry Shi", initials: "JS" }, dueDate: "Apr 7", workstream: "Marketing", workstreamColor: "#8b5cf6" },
+  { id: "14c", title: "Final deck delivery from Ben", status: "todo", priority: "high", assignee: { name: "Ben Fogarty", initials: "BF" }, dueDate: "Apr 10", workstream: "Marketing", workstreamColor: "#8b5cf6" },
+  { id: "14d", title: "Team bios — Jason, Jerry, Alic (American audience framing)", status: "todo", priority: "high", workstream: "Marketing", workstreamColor: "#8b5cf6" },
+  { id: "14e", title: "Case study confirmation — AIP Corp Monarch referencability", status: "todo", priority: "medium", workstream: "Marketing", workstreamColor: "#8b5cf6" },
+  { id: "14f", title: "UUL Compass platform screenshots / demo video", status: "todo", priority: "medium", workstream: "Marketing", workstreamColor: "#8b5cf6" },
+  { id: "16", title: "Lock key stats for all marketing materials (needs Jason input on service architecture)", status: "todo", priority: "medium", workstream: "Marketing", workstreamColor: "#8b5cf6" },
   // Technology & AI
   { id: "17", title: "Deploy Compass OS (this system)", status: "in_progress", priority: "critical", assignee: { name: "David Wu", initials: "DW" }, dueDate: "Apr 7", workstream: "Technology", workstreamColor: "#06b6d4" },
   { id: "18", title: "Pallet pricing pilot — 95% complete, finalize", status: "in_progress", priority: "high", assignee: { name: "Jason Likens", initials: "JL" }, workstream: "Technology", workstreamColor: "#06b6d4" },
