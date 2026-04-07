@@ -6,7 +6,7 @@ export function TopNav() {
   return (
     <nav className="fixed top-0 w-full z-50 bg-slate-950 backdrop-blur-xl border-b border-slate-800/50 flex justify-between items-center px-6 h-16">
       <Link href="/" className="font-serif text-blue-200 tracking-widest text-xl hover:text-blue-100 transition-colors">
-        Compass
+        UUL Global
       </Link>
       <div className="flex items-center gap-4">
         <div className="relative hidden sm:block">

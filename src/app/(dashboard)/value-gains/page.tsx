@@ -100,10 +100,10 @@ export default async function GrowthPage() {
       {/* ── Header ──────────────────────────────────────── */}
       <div>
         <h1 className="font-serif text-3xl lg:text-4xl font-light tracking-tight text-slate-100">
-          Growth & Revenue
+          Initiatives
         </h1>
         <p className="mt-2 text-sm text-slate-400">
-          Revenue opportunities, new market development, and value creation initiatives.
+          Strategic bets, value creation, and market development for the 100-day plan.
         </p>
       </div>
 
@@ -243,6 +243,51 @@ export default async function GrowthPage() {
             </svg>
           );
         })()}
+      </div>
+
+      {/* ── Board Decisions ─────────────────────────────── */}
+      <div>
+        <h2 className="font-serif text-2xl text-white mb-5">Board Decisions</h2>
+        <div className="space-y-4">
+          {[
+            {
+              date: "Mar 31, 2026", meeting: "Strategy Call",
+              attendees: "Jerry, Alic, Billy, Season",
+              items: ["Exploring logistics stablecoin for on-chain factoring", "LC Warehouse + Packsmith WMS integration approved", "Ben Fogarty hired for corporate deck rewrite ($4K)"],
+            },
+            {
+              date: "Mar 26, 2026", meeting: "Board Decision",
+              attendees: "Jerry, Alic, Billy, Season",
+              items: ["Shenzhen warehouse expansion approved", "Hiring 3 operations managers in Q2"],
+            },
+            {
+              date: "Mar 25, 2026", meeting: "Operations & Cash Flow Review",
+              attendees: "Jerry, Alic, Billy, Season, Jason, Josh",
+              items: ["VP Finance hire approved at RMB 250-300K/year", "$20K marketing budget approved", "Bridge financing: Jerry to provide $300K if needed Apr-May", "Supply chain finance partnerships: Standard Chartered + Klear"],
+            },
+            {
+              date: "Mar 23, 2026", meeting: "Board Sync",
+              attendees: "Jerry, Alic, Billy",
+              items: ["New sales rule: collect payment before shipping for all new contracts", "Silfab Plan A: demand 30% prepayment before port arrival", "Board structure: Jerry (Chair), Alic, Billy, Season", "Jason Likens appointed CEO US, Josh Foster appointed COO US", "Three business pillars confirmed: Logistics, SCF, Compliance & Sourcing"],
+            },
+          ].map((decision, di) => (
+            <div key={di} className="rounded-lg bg-[#131b2d] p-5">
+              <div className="flex items-center gap-3 mb-3">
+                <span className="text-[10px] font-mono text-slate-600 tabular-nums">{decision.date}</span>
+                <span className="text-sm text-white font-medium">{decision.meeting}</span>
+                <span className="text-[11px] text-slate-500 ml-auto">{decision.attendees}</span>
+              </div>
+              <div className="space-y-2">
+                {decision.items.map((item, ii) => (
+                  <div key={ii} className="flex items-start gap-2">
+                    <span className="material-symbols-outlined text-emerald-400 text-sm mt-0.5" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
+                    <span className="text-[12px] text-slate-300">{item}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

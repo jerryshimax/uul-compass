@@ -3,8 +3,8 @@ import type { MetricData, PillarMetric, FinancialPulseMetric } from "../types";
 // Financial Pulse — compact cash/AR/working capital snapshot for dashboard
 export const demoFinancialPulse: FinancialPulseMetric[] = [
   { id: "fp-cash", label: "Cash Position", value: "$2.1M", subLabel: "Across 4 entities", trend: "down", status: "amber" },
-  { id: "fp-ar", label: "AR Outstanding", value: "$1.8M", subLabel: "Silfab: $1.2M", trend: "flat", status: "red" },
-  { id: "fp-wc", label: "Working Capital", value: "-$340K", subLabel: "AR financing: pending", status: "red" },
+  { id: "fp-ar", label: "AR Outstanding", value: "$1.8M", subLabel: "Silfab $1.2M (pp/cc, 90+ day cycle)", trend: "flat", status: "red" },
+  { id: "fp-wc", label: "Capital Fronted", value: "~3 mo", subLabel: "30+60+30 day AR cycle", status: "red" },
   { id: "fp-value", label: "Value Captured", value: "$0", subLabel: "$1.9M target", trend: "flat", status: "gray" },
 ];
 

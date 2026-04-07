@@ -56,6 +56,7 @@ export function PlanContent({
   const [activePhaseNum, setActivePhaseNum] = useState<1 | 2 | 3>(1);
   const [activeWorkstream, setActiveWorkstream] = useState<string | null>(null);
   const [showDone, setShowDone] = useState(false);
+  const [viewMode, setViewMode] = useState<"board" | "list">("board");
 
   // Filter by phase + workstream
   let filtered = tasks.filter((t) => t.phase === activePhaseNum);
@@ -181,8 +182,9 @@ export function PlanContent({
         })}
       </div>
 
-      {/* ═══ Status Summary ═══════════════════════════════════════ */}
-      <div className="flex flex-wrap gap-3">
+      {/* ═══ Status Summary + View Toggle ═════════════════════════ */}
+      <div className="flex items-center justify-between">
+        <div className="flex flex-wrap gap-3">
         {(["blocked", "in_progress", "todo", "done"] as const).map((status) => {
           const count = statusCounts[status] || 0;
           const cfg = STATUS_CONFIG[status];
@@ -194,9 +196,68 @@ export function PlanContent({
             </span>
           );
         })}
+        </div>
+
+        {/* View toggle */}
+        <div className="flex items-center gap-1 bg-[#131b2d] rounded-lg p-1">
+          <button
+            onClick={() => setViewMode("board")}
+            className={`p-1.5 rounded-md transition-colors ${
+              viewMode === "board" ? "bg-[#1a2744] text-[#b4c5ff]" : "text-slate-500 hover:text-slate-300"
+            }`}
+          >
+            <span className="material-symbols-outlined text-lg">view_column</span>
+          </button>
+          <button
+            onClick={() => setViewMode("list")}
+            className={`p-1.5 rounded-md transition-colors ${
+              viewMode === "list" ? "bg-[#1a2744] text-[#b4c5ff]" : "text-slate-500 hover:text-slate-300"
+            }`}
+          >
+            <span className="material-symbols-outlined text-lg">view_list</span>
+          </button>
+        </div>
       </div>
 
-      {/* ═══ Priority-Grouped Task List ════════════════════════════ */}
+      {/* ═══ Board View (Kanban) ═══════════════════════════════════ */}
+      {viewMode === "board" && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {(["blocked", "in_progress", "todo", "done"] as const).map((status) => {
+            const cfg = STATUS_CONFIG[status];
+            const columnTasks = filtered
+              .filter((t) => t.status === status)
+              .sort((a, b) => (PRIORITY_ORDER[a.priority] ?? 9) - (PRIORITY_ORDER[b.priority] ?? 9));
+
+            return (
+              <div key={status}>
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <span className={`material-symbols-outlined text-sm ${cfg.color}`}>{cfg.icon}</span>
+                    <span className="text-[10px] uppercase tracking-widest font-semibold text-slate-400">
+                      {cfg.label}
+                    </span>
+                  </div>
+                  <span className="text-[10px] tabular-nums text-slate-600">{columnTasks.length}</span>
+                </div>
+
+                <div className="space-y-2">
+                  {columnTasks.map((task) => (
+                    <BoardCard key={task.id} task={task} />
+                  ))}
+                  {columnTasks.length === 0 && (
+                    <div className="rounded-lg bg-[#131b2d] p-4 text-center text-[11px] text-slate-600">
+                      No tasks
+                    </div>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* ═══ List View (Priority-Grouped) ══════════════════════════ */}
+      {viewMode === "list" && (
       <div className="space-y-6">
         {priorityGroups.map((group) => {
           const cfg = PRIORITY_CONFIG[group.priority];
@@ -248,6 +309,7 @@ export function PlanContent({
           </div>
         )}
       </div>
+      )}
 
       {/* ═══ Decision Gates ═══════════════════════════════════════ */}
       {(() => {
@@ -338,6 +400,41 @@ function TaskRow({ task }: { task: TaskData }) {
           Cross-Office
         </span>
       )}
+    </div>
+  );
+}
+
+// ─── Board Card (Kanban) ────────────────────────────────────────
+function BoardCard({ task }: { task: TaskData }) {
+  const isCritical = task.priority === "critical";
+  const isHigh = task.priority === "high";
+  const isDone = task.status === "done";
+
+  return (
+    <div className={`rounded-lg bg-[#131b2d] p-3 border border-slate-700/30 ${
+      isCritical ? "border-l-2 border-l-red-400" :
+      isHigh ? "border-l-2 border-l-amber-400" : ""
+    }`}>
+      <div className="flex items-center gap-2 mb-1.5">
+        <span className="text-[10px] font-mono text-slate-600">{task.taskCode}</span>
+        {isCritical && (
+          <span className="text-[9px] uppercase tracking-wider text-red-400 font-semibold">Critical</span>
+        )}
+        {task.isCrossOffice && (
+          <span className="text-[9px] uppercase tracking-wider text-[#dfc299]/60">Cross-Office</span>
+        )}
+      </div>
+      <p className={`text-[12px] leading-snug mb-2 ${isDone ? "line-through text-slate-600" : "text-slate-200"}`}>
+        {task.title}
+      </p>
+      <div className="flex items-center justify-between">
+        <span className="text-[11px] text-slate-500 truncate max-w-[100px]">
+          {task.assignee?.name.split(" ")[0] || "—"}
+        </span>
+        {task.dueDate && (
+          <span className="text-[10px] font-mono text-slate-600 tabular-nums">{task.dueDate}</span>
+        )}
+      </div>
     </div>
   );
 }
