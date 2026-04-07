@@ -119,11 +119,6 @@ export function PlanContent({
     return { priority, tasks: groupTasks };
   }).filter((g) => g.tasks.length > 0);
 
-  const statusCounts = filtered.reduce((acc, t) => {
-    acc[t.status] = (acc[t.status] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
-
   const activePhase = phases.find((p) => p.phaseNumber === activePhaseNum);
   const { t } = useLanguage();
   const canWrite = currentUser?.isAdmin || currentUser?.isContributor;
@@ -194,8 +189,8 @@ export function PlanContent({
         )}
       </div>
 
-      {/* ═══ Workstream Filters ═══════════════════════════════════ */}
-      <div className="flex flex-wrap gap-2">
+      {/* ═══ Workstream Filters + View Toggle ════════════════════ */}
+      <div className="flex items-center gap-2 flex-wrap">
         <button
           onClick={() => setActiveWorkstream(null)}
           className={`px-4 py-1.5 rounded-full text-[11px] uppercase font-semibold transition-all ${
@@ -225,25 +220,7 @@ export function PlanContent({
             </button>
           );
         })}
-      </div>
-
-      {/* ═══ Status Summary + View Toggle ═════════════════════════ */}
-      <div className="flex items-center justify-between">
-        <div className="flex flex-wrap gap-3">
-          {(["blocked", "in_progress", "todo", "done"] as const).map((status) => {
-            const count = statusCounts[status] || 0;
-            const cfg = STATUS_CONFIG[status];
-            return (
-              <span key={status} className="inline-flex items-center gap-2 rounded-full bg-[#131b2d] px-3 py-1.5 text-xs">
-                <span className={`material-symbols-outlined text-sm ${cfg.color}`}>{cfg.icon}</span>
-                <span className="tabular-nums font-medium text-white">{count}</span>
-                <span className="text-slate-500">{t(cfg.key)}</span>
-              </span>
-            );
-          })}
-        </div>
-
-        <div className="flex items-center gap-1 bg-[#131b2d] rounded-lg p-1">
+        <div className="ml-auto flex items-center gap-1 bg-[#131b2d] rounded-lg p-1">
           <button
             onClick={() => setViewMode("board")}
             className={`p-1.5 rounded-md transition-colors ${
@@ -274,14 +251,12 @@ export function PlanContent({
 
             return (
               <div key={status}>
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-2">
-                    <span className={`material-symbols-outlined text-sm ${cfg.color}`}>{cfg.icon}</span>
-                    <span className="text-[10px] uppercase tracking-widest font-semibold text-slate-400">
-                      {t(cfg.key)}
-                    </span>
-                  </div>
-                  <span className="text-[10px] tabular-nums text-slate-600">{columnTasks.length}</span>
+                <div className="flex items-center gap-2 mb-3">
+                  <span className={`material-symbols-outlined text-sm ${cfg.color}`}>{cfg.icon}</span>
+                  <span className="text-[10px] uppercase tracking-widest font-semibold text-slate-400">
+                    {t(cfg.key)}
+                  </span>
+                  <span className="text-[10px] font-semibold tabular-nums text-slate-400">{columnTasks.length}</span>
                 </div>
 
                 <div className="space-y-2">
