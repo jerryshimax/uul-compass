@@ -18,16 +18,10 @@ import {
   SelectTrigger,
 } from "@/components/ui/select";
 
-const PRIORITY_LABELS: Record<string, string> = {
-  critical: "Critical", high: "High", medium: "Medium", low: "Low",
-};
-const STATUS_LABELS: Record<string, string> = {
-  todo: "To Do", in_progress: "In Progress", review: "Review",
-  blocked: "Blocked", done: "Done",
-};
 import type { TaskData, WorkstreamData, UserOption } from "@/lib/data";
 import type { CurrentUser } from "@/lib/supabase/get-current-user";
 import { createTask, updateTask, deleteTask } from "@/lib/actions/tasks";
+import { useLanguage } from "@/lib/i18n/context";
 
 interface TaskModalProps {
   open: boolean;
@@ -60,6 +54,7 @@ export function TaskModal({
 }: TaskModalProps) {
   const [form, setForm] = useState(defaultForm);
   const [pending, startTransition] = useTransition();
+  const { t } = useLanguage();
 
   const isEdit = !!task;
   const canWrite = currentUser.isAdmin || currentUser.isContributor;
@@ -122,18 +117,18 @@ export function TaskModal({
       <DialogContent className="bg-[#131b2d] border-slate-700/50 max-w-lg">
         <DialogHeader>
           <DialogTitle className="text-slate-100 text-base">
-            {isEdit ? "Edit Task" : "New Task"}
+            {isEdit ? t("modal_editTask") : t("modal_newTask")}
           </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-3.5 py-1">
           {/* Title */}
           <div>
-            <label className="text-[11px] text-slate-400 mb-1 block uppercase tracking-wider">Title *</label>
+            <label className="text-[11px] text-slate-400 mb-1 block uppercase tracking-wider">{t("modal_titleLabel")} *</label>
             <Input
               value={form.title}
               onChange={(e) => set("title", e.target.value)}
-              placeholder="Task title"
+              placeholder={t("modal_taskTitlePlaceholder")}
               disabled={!canWrite || pending}
               className="bg-[#0e1525] border-slate-700/50 text-slate-100 h-9 text-sm"
             />
@@ -141,11 +136,11 @@ export function TaskModal({
 
           {/* Description */}
           <div>
-            <label className="text-[11px] text-slate-400 mb-1 block uppercase tracking-wider">Description</label>
+            <label className="text-[11px] text-slate-400 mb-1 block uppercase tracking-wider">{t("modal_description")}</label>
             <Textarea
               value={form.description}
               onChange={(e) => set("description", e.target.value)}
-              placeholder="Optional details..."
+              placeholder={t("modal_descriptionPlaceholder")}
               rows={3}
               disabled={!canWrite || pending}
               className="bg-[#0e1525] border-slate-700/50 text-slate-100 text-sm resize-none"
@@ -155,7 +150,7 @@ export function TaskModal({
           {/* Workstream + Phase */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-[11px] text-slate-400 mb-1 block uppercase tracking-wider">Workstream *</label>
+              <label className="text-[11px] text-slate-400 mb-1 block uppercase tracking-wider">{t("modal_workstream")} *</label>
               <Select
                 value={form.workstreamId}
                 onValueChange={(v) => set("workstreamId", v ?? "")}
@@ -164,7 +159,7 @@ export function TaskModal({
                 <SelectTrigger className="bg-[#0e1525] border-slate-700/50 text-slate-100 h-9 text-sm">
                   <span className="flex-1 text-left truncate">
                     {workstreams.find((w) => w.id === form.workstreamId)?.name
-                      ?? <span className="text-slate-500">Select...</span>}
+                      ?? <span className="text-slate-500">{t("modal_selectPlaceholder")}</span>}
                   </span>
                 </SelectTrigger>
                 <SelectContent className="bg-[#1a2236] border border-slate-700/60">
@@ -177,19 +172,19 @@ export function TaskModal({
               </Select>
             </div>
             <div>
-              <label className="text-[11px] text-slate-400 mb-1 block uppercase tracking-wider">Phase</label>
+              <label className="text-[11px] text-slate-400 mb-1 block uppercase tracking-wider">{t("modal_phase")}</label>
               <Select
                 value={String(form.phase)}
                 onValueChange={(v) => set("phase", Number(v ?? 1) as 1 | 2 | 3)}
                 disabled={!canWrite || pending}
               >
                 <SelectTrigger className="bg-[#0e1525] border-slate-700/50 text-slate-100 h-9 text-sm">
-                  <span className="flex-1 text-left">Phase {form.phase}</span>
+                  <span className="flex-1 text-left">{t("modal_phase")} {form.phase}</span>
                 </SelectTrigger>
                 <SelectContent className="bg-[#1a2236] border border-slate-700/60">
-                  <SelectItem value="1">Phase 1</SelectItem>
-                  <SelectItem value="2">Phase 2</SelectItem>
-                  <SelectItem value="3">Phase 3</SelectItem>
+                  <SelectItem value="1">{t("modal_phase")} 1</SelectItem>
+                  <SelectItem value="2">{t("modal_phase")} 2</SelectItem>
+                  <SelectItem value="3">{t("modal_phase")} 3</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -198,7 +193,7 @@ export function TaskModal({
           {/* Assignee + Priority */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-[11px] text-slate-400 mb-1 block uppercase tracking-wider">Assignee</label>
+              <label className="text-[11px] text-slate-400 mb-1 block uppercase tracking-wider">{t("modal_assignee")}</label>
               <Select
                 value={form.assigneeId}
                 onValueChange={(v) => set("assigneeId", v ?? "")}
@@ -207,11 +202,11 @@ export function TaskModal({
                 <SelectTrigger className="bg-[#0e1525] border-slate-700/50 text-slate-100 h-9 text-sm">
                   <span className="flex-1 text-left truncate">
                     {userOptions.find((u) => u.id === form.assigneeId)?.fullName
-                      ?? <span className="text-slate-500">Unassigned</span>}
+                      ?? <span className="text-slate-500">{t("modal_unassigned")}</span>}
                   </span>
                 </SelectTrigger>
                 <SelectContent className="bg-[#1a2236] border border-slate-700/60">
-                  <SelectItem value="">Unassigned</SelectItem>
+                  <SelectItem value="">{t("modal_unassigned")}</SelectItem>
                   {userOptions.map((u) => (
                     <SelectItem key={u.id} value={u.id}>
                       {u.fullName}
@@ -221,20 +216,20 @@ export function TaskModal({
               </Select>
             </div>
             <div>
-              <label className="text-[11px] text-slate-400 mb-1 block uppercase tracking-wider">Priority</label>
+              <label className="text-[11px] text-slate-400 mb-1 block uppercase tracking-wider">{t("modal_priority")}</label>
               <Select
                 value={form.priority}
                 onValueChange={(v) => set("priority", (v ?? "medium") as typeof form.priority)}
                 disabled={!canWrite || pending}
               >
                 <SelectTrigger className="bg-[#0e1525] border-slate-700/50 text-slate-100 h-9 text-sm">
-                  <span className="flex-1 text-left">{PRIORITY_LABELS[form.priority]}</span>
+                  <span className="flex-1 text-left">{t(`priority_${form.priority}`)}</span>
                 </SelectTrigger>
                 <SelectContent className="bg-[#1a2236] border border-slate-700/60">
-                  <SelectItem value="critical">Critical</SelectItem>
-                  <SelectItem value="high">High</SelectItem>
-                  <SelectItem value="medium">Medium</SelectItem>
-                  <SelectItem value="low">Low</SelectItem>
+                  <SelectItem value="critical">{t("priority_critical")}</SelectItem>
+                  <SelectItem value="high">{t("priority_high")}</SelectItem>
+                  <SelectItem value="medium">{t("priority_medium")}</SelectItem>
+                  <SelectItem value="low">{t("priority_low")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -243,26 +238,26 @@ export function TaskModal({
           {/* Status + Due Date */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-[11px] text-slate-400 mb-1 block uppercase tracking-wider">Status</label>
+              <label className="text-[11px] text-slate-400 mb-1 block uppercase tracking-wider">{t("modal_status")}</label>
               <Select
                 value={form.status}
                 onValueChange={(v) => set("status", (v ?? "todo") as typeof form.status)}
                 disabled={!canWrite || pending}
               >
                 <SelectTrigger className="bg-[#0e1525] border-slate-700/50 text-slate-100 h-9 text-sm">
-                  <span className="flex-1 text-left">{STATUS_LABELS[form.status]}</span>
+                  <span className="flex-1 text-left">{t(form.status === "in_progress" ? "status_inProgress" : form.status === "todo" ? "status_todo" : form.status === "done" ? "status_done" : form.status === "blocked" ? "status_blocked" : "status_review")}</span>
                 </SelectTrigger>
                 <SelectContent className="bg-[#1a2236] border border-slate-700/60">
-                  <SelectItem value="todo">To Do</SelectItem>
-                  <SelectItem value="in_progress">In Progress</SelectItem>
-                  <SelectItem value="review">Review</SelectItem>
-                  <SelectItem value="blocked">Blocked</SelectItem>
-                  <SelectItem value="done">Done</SelectItem>
+                  <SelectItem value="todo">{t("status_todo")}</SelectItem>
+                  <SelectItem value="in_progress">{t("status_inProgress")}</SelectItem>
+                  <SelectItem value="review">{t("status_review")}</SelectItem>
+                  <SelectItem value="blocked">{t("status_blocked")}</SelectItem>
+                  <SelectItem value="done">{t("status_done")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div>
-              <label className="text-[11px] text-slate-400 mb-1 block uppercase tracking-wider">Due Date</label>
+              <label className="text-[11px] text-slate-400 mb-1 block uppercase tracking-wider">{t("modal_dueDate")}</label>
               <Input
                 type="date"
                 value={form.dueDate}
@@ -282,7 +277,7 @@ export function TaskModal({
               disabled={!canWrite || pending}
               className="w-3.5 h-3.5 rounded accent-[#b4c5ff]"
             />
-            <span className="text-xs text-slate-400">Cross-office task</span>
+            <span className="text-xs text-slate-400">{t("modal_crossOffice")}</span>
           </label>
         </div>
 
@@ -295,7 +290,7 @@ export function TaskModal({
               disabled={pending}
               className="mr-auto text-xs h-8"
             >
-              Delete
+              {t("modal_delete")}
             </Button>
           )}
           <Button
@@ -305,7 +300,7 @@ export function TaskModal({
             disabled={pending}
             className="text-xs h-8 border-slate-700"
           >
-            Cancel
+            {t("modal_cancel")}
           </Button>
           {canWrite && (
             <Button
@@ -314,7 +309,7 @@ export function TaskModal({
               disabled={pending || !form.title.trim() || !form.workstreamId}
               className="text-xs h-8"
             >
-              {pending ? "Saving…" : isEdit ? "Save" : "Create"}
+              {pending ? t("modal_saving") : isEdit ? t("modal_save") : t("modal_create")}
             </Button>
           )}
         </DialogFooter>

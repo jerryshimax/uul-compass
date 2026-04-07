@@ -332,25 +332,32 @@ export function MyTasksContent({ tasks, currentUser, workstreams, userOptions }:
   return (
     <div className="space-y-10">
       {/* ── Header ─────────────────────────────────────────── */}
-      <section className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6">
-        <div className="space-y-4">
+      <section className="space-y-3">
+        <div className="flex items-center justify-between">
           <span className="text-[10px] font-semibold uppercase tracking-widest text-[#dfc299]">
             {t("tasks_operatorQueue")}
           </span>
+          {currentUser && (currentUser.isAdmin || currentUser.isContributor) && (
+            <button
+              onClick={openCreate}
+              className="flex items-center gap-1.5 rounded-lg bg-[#1a2744] hover:bg-[#1f3060] border border-[#b4c5ff]/20 text-[#b4c5ff] text-xs font-medium px-4 py-2 transition-colors"
+            >
+              <span className="material-symbols-outlined text-sm">add</span>
+              {t("tasks_newTask")}
+            </button>
+          )}
+        </div>
+        <div className="flex items-baseline gap-4">
           <h1 className="font-serif text-5xl font-light tracking-tight text-white leading-[1.1]">
             {t("tasks_title")}
           </h1>
-          <p className="text-sm text-slate-400 max-w-md">
-            {t("tasks_queueDesc")}
-          </p>
-        </div>
-        <div className="rounded-lg bg-[#131b2d] border-t-2 border-[#dfc299] px-6 py-4 text-center shrink-0">
-          <p className="text-[10px] uppercase tracking-widest text-slate-500 mb-1">{t("tasks_activeQueue")}</p>
-          <p className="font-serif text-4xl font-light tabular-nums text-white">
+          <span className="font-serif text-3xl font-light text-slate-600 tabular-nums">
             {activeTasks.length}
-          </p>
-          <p className="text-[10px] uppercase tracking-wider text-[#dfc299] mt-1">{t("tasks_directives")}</p>
+          </span>
         </div>
+        <p className="text-sm text-slate-400 max-w-md">
+          {t("tasks_queueDesc")}
+        </p>
       </section>
 
       <CollapsibleSection
@@ -408,13 +415,6 @@ export function MyTasksContent({ tasks, currentUser, workstreams, userOptions }:
           <p className="text-sm text-slate-600 mt-1">{t("tasks_tasksWillAppear")}</p>
         </div>
       )}
-
-      <button
-        onClick={openCreate}
-        className="fixed bottom-8 right-8 h-14 w-14 rounded-full bg-[#b4c5ff] text-[#0a0f1c] shadow-lg shadow-[#b4c5ff]/20 flex items-center justify-center hover:bg-[#c5d4ff] transition-colors z-50"
-      >
-        <span className="material-symbols-outlined text-2xl">add_task</span>
-      </button>
 
       {currentUser && (
         <TaskModal
