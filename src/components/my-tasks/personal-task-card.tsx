@@ -36,6 +36,7 @@ const statusBarColor: Record<TaskData["status"], string> = {
   blocked: "bg-red-500",
   done: "bg-emerald-500",
   todo: "bg-gray-500",
+  review: "bg-amber-500",
 };
 
 function isOverdue(dateStr: string): boolean {

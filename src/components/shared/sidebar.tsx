@@ -5,11 +5,11 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { getNavBySection } from "./nav-items";
 import { Compass } from "lucide-react";
-import { getCurrentDay } from "@/lib/data";
+import { calcDayNumber } from "@/lib/utils";
 
 export function Sidebar() {
   const pathname = usePathname();
-  const dayNumber = getCurrentDay();
+  const dayNumber = calcDayNumber("2026-04-01", 100);
   const totalDays = 100;
   const pct = Math.round((dayNumber / totalDays) * 100);
 

@@ -156,7 +156,7 @@ export async function getMilestones(): Promise<MilestoneData[]> {
       name: m.name,
       workstream: ws?.name ?? "",
       workstreamColor: ws?.color ?? "#6b7280",
-      targetDate: m.targetDate ? formatDueDate(m.targetDate) : "",
+      targetDate: formatDueDate(m.targetDate) ?? "",
       status: m.status as MilestoneData["status"],
       phase: (m.phase ?? 1) as 1 | 2 | 3,
       linkedTaskCount: linked.length,
