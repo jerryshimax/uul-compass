@@ -18,6 +18,7 @@ export type {
   ActivityItem,
 } from "./types";
 
+import { cache } from "react";
 import { db } from "@/db";
 import {
   pmiTasks,
@@ -96,15 +97,36 @@ function dateToDayNumber(dateStr: string): number {
 
 // ─── Primary getters ───────────────────────────────────────────
 
-export async function getTasks(): Promise<TaskData[]> {
+export const getTasks = cache(async (): Promise<TaskData[]> => {
   const rows = await db
-    .select()
+    .select({
+      t: {
+        id: pmiTasks.id,
+        taskCode: pmiTasks.taskCode,
+        title: pmiTasks.title,
+        description: pmiTasks.description,
+        status: pmiTasks.status,
+        priority: pmiTasks.priority,
+        dueDate: pmiTasks.dueDate,
+        phase: pmiTasks.phase,
+        milestoneId: pmiTasks.milestoneId,
+        isCrossOffice: pmiTasks.isCrossOffice,
+        sortOrder: pmiTasks.sortOrder,
+      },
+      ws: {
+        name: pmiWorkstreams.name,
+        color: pmiWorkstreams.color,
+      },
+      u: {
+        fullName: users.fullName,
+      },
+    })
     .from(pmiTasks)
     .leftJoin(pmiWorkstreams, eq(pmiTasks.workstreamId, pmiWorkstreams.id))
     .leftJoin(users, eq(pmiTasks.assigneeId, users.id))
     .orderBy(asc(pmiTasks.sortOrder));
 
-  return rows.map(({ pmi_tasks: t, pmi_workstreams: ws, users: u }) => ({
+  return rows.map(({ t, ws, u }) => ({
     id: t.id,
     taskCode: t.taskCode ?? "",
     title: t.title,
@@ -121,7 +143,7 @@ export async function getTasks(): Promise<TaskData[]> {
     milestoneId: t.milestoneId ?? undefined,
     isCrossOffice: t.isCrossOffice,
   }));
-}
+});
 
 export async function getWorkstreams(): Promise<WorkstreamData[]> {
   const [tasks, rows] = await Promise.all([

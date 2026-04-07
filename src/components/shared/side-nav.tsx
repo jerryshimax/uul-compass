@@ -2,12 +2,28 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState, useRef, useEffect } from "react";
 import { useLanguage } from "@/lib/i18n/context";
+import { logoutAction } from "@/lib/actions/auth";
 
-export function SideNav() {
+type UserProps = { fullName: string; email: string; role: string } | null;
+
+export function SideNav({ user }: { user: UserProps }) {
   const pathname = usePathname();
   const { t } = useLanguage();
   const myTasksActive = pathname.startsWith("/my-tasks");
+  const [supportOpen, setSupportOpen] = useState(false);
+  const supportRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (supportRef.current && !supportRef.current.contains(e.target as Node)) {
+        setSupportOpen(false);
+      }
+    }
+    if (supportOpen) document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [supportOpen]);
 
   const mainNav = [
     { labelKey: "nav_home" as const, icon: "dashboard", href: "/" },
@@ -60,7 +76,7 @@ export function SideNav() {
           })}
         </nav>
 
-        {/* My Tasks — prominent button */}
+        {/* My Tasks */}
         <div className="mt-6">
           <Link
             href="/my-tasks"
@@ -100,15 +116,39 @@ export function SideNav() {
       </div>
 
       {/* Footer */}
-      <div className="mt-auto p-6 border-t border-slate-800/50">
-        <a href="#" className="flex items-center gap-3 px-4 py-2 text-slate-500 hover:text-slate-300 transition-all">
-          <span className="material-symbols-outlined">help_outline</span>
-          <span className="font-sans text-sm font-light tracking-wide">{t("nav_support")}</span>
-        </a>
-        <a href="#" className="flex items-center gap-3 px-4 py-2 text-slate-500 hover:text-slate-300 transition-all">
+      <div className="mt-auto p-6 border-t border-slate-800/50 space-y-1">
+        {/* Support */}
+        <div className="relative" ref={supportRef}>
+          <button
+            onClick={() => setSupportOpen((v) => !v)}
+            className="flex items-center gap-3 px-4 py-2 w-full text-slate-500 hover:text-slate-300 transition-all"
+          >
+            <span className="material-symbols-outlined">help_outline</span>
+            <span className="font-sans text-sm font-light tracking-wide">{t("nav_support")}</span>
+          </button>
+          {supportOpen && (
+            <div className="absolute bottom-12 left-0 w-56 bg-slate-900 border border-slate-800 rounded-xl shadow-2xl shadow-black/40 p-4">
+              <p className="text-xs font-semibold text-slate-300 mb-3">Need help?</p>
+              <a
+                href="mailto:admin@uulglobal.com"
+                className="flex items-center gap-2 text-xs text-blue-400 hover:text-blue-300 transition-colors"
+              >
+                <span className="material-symbols-outlined text-base">mail</span>
+                admin@uulglobal.com
+              </a>
+              <p className="text-[11px] text-slate-600 mt-2">Contact admin for access issues or technical support.</p>
+            </div>
+          )}
+        </div>
+
+        {/* Logout */}
+        <button
+          onClick={() => logoutAction()}
+          className="flex items-center gap-3 px-4 py-2 w-full text-slate-500 hover:text-red-400 transition-all"
+        >
           <span className="material-symbols-outlined">logout</span>
           <span className="font-sans text-sm font-light tracking-wide">{t("nav_logout")}</span>
-        </a>
+        </button>
       </div>
     </aside>
   );

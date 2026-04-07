@@ -54,7 +54,8 @@ export const departments = pgTable("departments", {
 
 // ─── Users (Internal Team) ──────────────────────────────────────
 export const users = pgTable("users", {
-  id: uuid().defaultRandom().primaryKey(), // maps to auth.users
+  id: uuid().defaultRandom().primaryKey(),
+  authId: uuid("auth_id").unique(), // auth.users.id — set on first login
   entityId: uuid("entity_id").references(() => entities.id),
   officeId: uuid("office_id").references(() => offices.id),
   departmentId: uuid("department_id").references(() => departments.id),

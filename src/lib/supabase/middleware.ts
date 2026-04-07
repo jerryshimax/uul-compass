@@ -31,10 +31,16 @@ export async function updateSession(request: NextRequest) {
 
   // Redirect unauthenticated users to login (except auth pages)
   const isAuthPage = request.nextUrl.pathname.startsWith("/login") ||
-    request.nextUrl.pathname.startsWith("/invite");
+    request.nextUrl.pathname.startsWith("/signup") ||
+    request.nextUrl.pathname.startsWith("/auth/callback");
 
   if (!user && !isAuthPage) {
     const url = request.nextUrl.clone();
+    // Auth code landed on wrong path (Supabase Site URL) — route to callback
+    if (url.searchParams.has("code")) {
+      url.pathname = "/auth/callback";
+      return NextResponse.redirect(url);
+    }
     url.pathname = "/login";
     return NextResponse.redirect(url);
   }
