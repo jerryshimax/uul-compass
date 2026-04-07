@@ -9,6 +9,16 @@ import type {
   MilestoneData,
 } from "@/lib/data";
 import { useLanguage } from "@/lib/i18n/context";
+import type { TranslationKey } from "@/lib/i18n/translations";
+
+const WORKSTREAM_KEYS: Record<string, TranslationKey> = {
+  "Finance": "ws_Finance",
+  "Operations": "ws_Operations",
+  "Sales": "ws_Sales",
+  "Brand & Marketing": "ws_BrandMarketing",
+  "Technology & AI": "ws_TechnologyAI",
+  "Organization & HR": "ws_OrgHR",
+};
 
 // ─── Props ───────────────────────────────────────────────────────
 interface PlanContentProps {
@@ -145,7 +155,7 @@ export function PlanContent({
               {activePhase.subtitle}
             </span>
             <span className="text-[11px] text-slate-500 tabular-nums">
-              Days {activePhase.startDay}–{activePhase.endDay} &middot; {activePhase.startDate} – {activePhase.endDate}
+              {t("plan_days")} {activePhase.startDay}–{activePhase.endDay} &middot; {activePhase.startDate} – {activePhase.endDate}
             </span>
           </div>
         )}
@@ -177,7 +187,7 @@ export function PlanContent({
               }`}
             >
               <span className="w-2 h-2 rounded-full" style={{ backgroundColor: ws.color }} />
-              {ws.name}
+              {WORKSTREAM_KEYS[ws.name] ? t(WORKSTREAM_KEYS[ws.name]) : ws.name}
               <span className="text-slate-600">{count}</span>
             </button>
           );
@@ -248,7 +258,7 @@ export function PlanContent({
                   ))}
                   {columnTasks.length === 0 && (
                     <div className="rounded-lg bg-[#131b2d] p-4 text-center text-[11px] text-slate-600">
-                      No tasks
+                      {t("plan_noTasks")}
                     </div>
                   )}
                 </div>
@@ -341,7 +351,7 @@ export function PlanContent({
                         {isPassed ? "check_circle" : "door_front"}
                       </span>
                       <span className="text-[10px] font-mono text-slate-500 tabular-nums">
-                        Day {gate.dayNumber} &middot; {gate.targetDate}
+                        {t("plan_day")} {gate.dayNumber} &middot; {gate.targetDate}
                       </span>
                     </div>
                     <p className="text-sm text-slate-200">{gate.name}</p>
@@ -399,6 +409,7 @@ function BoardCard({ task }: { task: TaskData }) {
   const isCritical = task.priority === "critical";
   const isHigh = task.priority === "high";
   const isDone = task.status === "done";
+  const { t } = useLanguage();
 
   return (
     <div className={`rounded-lg bg-[#131b2d] p-3 border border-slate-700/30 ${
@@ -408,10 +419,10 @@ function BoardCard({ task }: { task: TaskData }) {
       <div className="flex items-center gap-2 mb-1.5">
         <span className="text-[10px] font-mono text-slate-600">{task.taskCode}</span>
         {isCritical && (
-          <span className="text-[9px] uppercase tracking-wider text-red-400 font-semibold">Critical</span>
+          <span className="text-[9px] uppercase tracking-wider text-red-400 font-semibold">{t("priority_critical")}</span>
         )}
         {task.isCrossOffice && (
-          <span className="text-[9px] uppercase tracking-wider text-[#dfc299]/60">Cross-Office</span>
+          <span className="text-[9px] uppercase tracking-wider text-[#dfc299]/60">{t("plan_crossOffice")}</span>
         )}
       </div>
       <p className={`text-[12px] leading-snug mb-2 ${isDone ? "line-through text-slate-600" : "text-slate-200"}`}>

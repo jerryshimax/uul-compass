@@ -1,7 +1,17 @@
 "use client";
 
 import { useLanguage } from "@/lib/i18n/context";
+import type { TranslationKey } from "@/lib/i18n/translations";
 import type { RiskData, TaskData } from "@/lib/data";
+
+const WORKSTREAM_KEYS: Record<string, TranslationKey> = {
+  "Finance": "ws_Finance",
+  "Operations": "ws_Operations",
+  "Sales": "ws_Sales",
+  "Brand & Marketing": "ws_BrandMarketing",
+  "Technology & AI": "ws_TechnologyAI",
+  "Organization & HR": "ws_OrgHR",
+};
 
 const severityConfig = {
   high: { border: "border-red-400", badge: "text-red-400 bg-red-400/10", key: "risks_high" as const },
@@ -100,7 +110,9 @@ export function RisksContent({ risks, linkedTasksMap }: RisksContentProps) {
                     {t(status.key)}
                   </span>
                   {risk.workstream && (
-                    <span className="text-[10px] text-slate-600">{risk.workstream}</span>
+                    <span className="text-[10px] text-slate-600">
+                      {WORKSTREAM_KEYS[risk.workstream] ? t(WORKSTREAM_KEYS[risk.workstream]) : risk.workstream}
+                    </span>
                   )}
                   <div className="ml-auto flex items-center gap-2">
                     <span className="text-[11px] text-slate-500">{risk.owner.name}</span>

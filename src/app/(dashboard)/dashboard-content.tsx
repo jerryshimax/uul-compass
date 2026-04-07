@@ -207,7 +207,11 @@ export function DashboardContent({
                         </span>
                       )}
                       <span className={`text-[10px] uppercase tracking-wider font-semibold ${item.badgeColor}`}>
-                        {item.badge === "Critical" ? t("dash_critical") : item.badge}
+                        {item.badge === "Critical" ? t("dash_critical") :
+                         item.badge === "Blocked" ? t("status_blocked") :
+                         item.badge === "Overdue" ? t("dash_overdue") :
+                         item.badge.startsWith("Day ") ? `${t("plan_day")} ${item.badge.slice(4)}` :
+                         item.badge}
                       </span>
                     </div>
                     <p className="text-sm text-white">{item.title}</p>

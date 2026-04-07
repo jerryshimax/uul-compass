@@ -50,6 +50,14 @@ const en = {
   plan_noTasksFor: "for",
   plan_completedCount: "completed",
   plan_crossOffice: "Cross-Office",
+  plan_days: "Days",
+  // Workstream names (used as filter labels)
+  ws_Finance: "Finance",
+  ws_Operations: "Operations",
+  ws_Sales: "Sales",
+  ws_BrandMarketing: "Brand & Marketing",
+  ws_TechnologyAI: "Technology & AI",
+  ws_OrgHR: "Organization & HR",
   // Status
   status_blocked: "Blocked",
   status_inProgress: "In Progress",
@@ -206,6 +214,14 @@ const zh: typeof en = {
   plan_noTasksFor: "来自",
   plan_completedCount: "已完成",
   plan_crossOffice: "跨办公室",
+  plan_days: "第",
+  // Workstream names
+  ws_Finance: "财务",
+  ws_Operations: "运营",
+  ws_Sales: "销售",
+  ws_BrandMarketing: "品牌与市场",
+  ws_TechnologyAI: "技术与AI",
+  ws_OrgHR: "组织与人力",
   // Status
   status_blocked: "受阻",
   status_inProgress: "进行中",
