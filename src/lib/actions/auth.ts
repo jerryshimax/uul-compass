@@ -24,7 +24,7 @@ export async function loginAction(email: string, password: string): Promise<{ er
   const [user] = await db
     .select({ id: users.id, authId: users.authId })
     .from(users)
-    .where(eq(sql`lower(${users.email})`, email.trim().toLowerCase()))
+    .where(eq(sql`lower(trim(${users.email}))`, email.trim().toLowerCase()))
     .limit(1);
 
   if (!user) {
@@ -44,7 +44,7 @@ export async function signUpAction(email: string, password: string): Promise<{ e
   const [user] = await db
     .select({ id: users.id, authId: users.authId })
     .from(users)
-    .where(eq(sql`lower(${users.email})`, email.trim().toLowerCase()))
+    .where(eq(sql`lower(trim(${users.email}))`, email.trim().toLowerCase()))
     .limit(1);
 
   if (!user) {
