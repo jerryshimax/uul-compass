@@ -48,13 +48,7 @@
 
 **`task_priority` enum values:** `critical`, `high`, `medium`, `low`
 
-**Status mapping from meeting AI output:**
-| AI sends | Store as |
-|----------|----------|
-| `not_started` | `todo` |
-| `in_progress` | `in_progress` |
-| `blocked` | `blocked` |
-| `completed` | `done` |
+**`task_status` valid values (send these directly):** `todo`, `in_progress`, `blocked`, `review`, `done`
 
 ---
 
@@ -84,12 +78,7 @@
 
 **`risk_severity` enum values:** `high`, `medium`, `low`
 
-**Status mapping from meeting AI output:**
-| AI sends | Store as |
-|----------|----------|
-| `active` | `open` |
-| `mitigated` | `mitigating` |
-| `closed` | `resolved` |
+**`risk_status` valid values (send these directly):** `open`, `mitigating`, `resolved`
 
 > **No `category` column.** Risks are categorized by `workstream_id`. Resolve workstream name → UUID when creating new risks.
 
@@ -263,6 +252,27 @@ Returns all value initiatives with resolved owner names.
 
 ---
 
+### GET /api/users/list
+
+Returns all active users. Use this to resolve names client-side before sending a POST, or to flag unknown names to the user before submission.
+
+**Response:**
+```json
+[
+  {
+    "id": "uuid",
+    "full_name": "Jerry Shi",
+    "full_name_zh": "施杰",
+    "email": "jerry@uul.com",
+    "role": "owner"
+  }
+]
+```
+
+> Only returns `is_active = true` users. Use `full_name` or `full_name_zh` for matching.
+
+---
+
 ### POST /api/meeting/process
 
 Processes all updates from a single meeting in one payload. All arrays are optional.
@@ -271,7 +281,7 @@ Processes all updates from a single meeting in one payload. All arrays are optio
 ```json
 {
   "source": {
-    "type": "board_call",
+    "type": "board",
     "title": "UUL Board Call - Apr 9",
     "date": "2026-04-09",
     "participants": ["Jerry Shi", "Ray Chen"]
@@ -330,9 +340,10 @@ Processes all updates from a single meeting in one payload. All arrays are optio
 ```
 
 **Field notes for the AI:**
-- `source.type`: use `board_call`, `meeting`, `transcript`, or `notes` — mapped to `meeting_type` in DB
-- `task_updates[].updates.status`: must be one of `todo`, `in_progress`, `blocked`, `review`, `done` (or the alias values listed in the status mapping table above)
-- `risk_updates[].updates.status`: must be one of `open`, `mitigating`, `resolved` (or alias values)
+- `source.type`: send the `meeting_type` DB value directly — `board`, `leadership`, `department`, or `strategy`. No server-side mapping.
+- `task_updates[].updates.status`: must be one of `todo`, `in_progress`, `blocked`, `review`, `done`
+- `new_tasks[].status`: same enum — use `todo` for not started
+- `risk_updates[].updates.status`: must be one of `open`, `mitigating`, `resolved`
 - `new_tasks[].workstream`: plain text name — resolved to `workstream_id` by the server
 - `new_tasks[].assignee`: plain text name — resolved to `assignee_id` via `users.full_name` by the server
 - `new_risks[].owner`: plain text name — resolved to `owner_id` by the server
@@ -402,8 +413,9 @@ For workstreams:
 ## Recommended Pre-flight Workflow for AI
 
 Before processing a meeting transcript:
-1. `GET /api/tasks/list` — build a lookup map of `title + task_code → task_id`
-2. `GET /api/risks/list` — build a lookup map of `title → risk_id`
-3. `GET /api/initiatives/list` — build a lookup map of `name → initiative_id`
-4. Match transcript references to IDs (fuzzy match on title/code)
-5. `POST /api/meeting/process` with resolved IDs in `task_id`, `risk_id`, `initiative_id` fields
+1. `GET /api/users/list` — build name → UUID map; flag any transcript participants not found
+2. `GET /api/tasks/list` — build lookup map of `title + task_code → task_id`
+3. `GET /api/risks/list` — build lookup map of `title → risk_id`
+4. `GET /api/initiatives/list` — build lookup map of `name → initiative_id`
+5. Match transcript references to IDs (fuzzy match on title/code)
+6. `POST /api/meeting/process` with resolved UUIDs in `task_id`, `risk_id`, `initiative_id` fields; send plain text names for `assignee`/`owner`/`workstream` only if UUID is unknown (server will attempt resolution)
