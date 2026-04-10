@@ -10,6 +10,7 @@ import {
 import { valueCategoryEnum, valueStatusEnum } from "./enums";
 import { users } from "./org";
 import { pmiWorkstreams } from "./pmi";
+import { meetingNotes } from "./communication";
 
 // ─── Value Initiatives (Profit Improvement Levers) ─────────────
 export const valueInitiatives = pgTable("value_initiatives", {
@@ -23,6 +24,8 @@ export const valueInitiatives = pgTable("value_initiatives", {
   status: valueStatusEnum().default("planned").notNull(),
   ownerId: uuid("owner_id").references(() => users.id),
   workstreamId: uuid("workstream_id").references(() => pmiWorkstreams.id),
+  progress: integer().default(0).notNull(), // 0-100 percentage
+  meetingId: uuid("meeting_id").references(() => meetingNotes.id), // last meeting that touched this initiative (audit trail)
   measurementMethod: text("measurement_method"),
   startDate: date("start_date"),
   targetDate: date("target_date"),

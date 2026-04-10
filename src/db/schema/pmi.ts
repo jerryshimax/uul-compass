@@ -11,6 +11,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { pmiStatusEnum, taskStatusEnum, taskPriorityEnum } from "./enums";
 import { users, departments } from "./org";
+import { meetingNotes } from "./communication";
 
 // ─── PMI Workstreams ────────────────────────────────────────────
 export const pmiWorkstreams = pgTable("pmi_workstreams", {
@@ -65,6 +66,9 @@ export const pmiTasks = pgTable("pmi_tasks", {
   priority: taskPriorityEnum().default("medium").notNull(),
   dueDate: date("due_date"),
   completedAt: timestamp("completed_at", { withTimezone: true }),
+  progress: integer().default(0).notNull(), // 0-100 percentage
+  notes: text(), // latest update note from meetings
+  meetingId: uuid("meeting_id").references(() => meetingNotes.id), // last meeting that touched this task (audit trail)
   tags: text().array(),
   sortOrder: integer("sort_order").default(0),
   metadata: jsonb(), // SOP references, tribal knowledge notes, etc.

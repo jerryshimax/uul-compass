@@ -6,6 +6,7 @@ import {
   date,
   timestamp,
 } from "drizzle-orm/pg-core";
+import { meetingNotes } from "./communication";
 import { riskSeverityEnum, riskStatusEnum } from "./enums";
 import { users } from "./org";
 import { pmiWorkstreams } from "./pmi";
@@ -22,6 +23,8 @@ export const risks = pgTable("risks", {
   workstreamId: uuid("workstream_id").references(() => pmiWorkstreams.id),
   // Stored as task codes (e.g. ["F1","O2"]) — resolved to UUIDs at query time
   linkedTaskCodes: text("linked_task_codes").array(),
+  notes: text(), // latest update note from meetings
+  meetingId: uuid("meeting_id").references(() => meetingNotes.id), // last meeting that touched this risk (audit trail)
   raisedDate: date("raised_date"),
   targetDate: date("target_date"),
   resolvedDate: date("resolved_date"),
