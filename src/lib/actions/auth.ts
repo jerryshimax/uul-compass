@@ -12,8 +12,8 @@ async function linkAuthId(userId: string, authUserId: string, currentAuthId: str
   }
 }
 
-export async function loginAction(email: string, password: string): Promise<{ error: string } | never> {
-  const supabase = await createClient();
+export async function loginAction(email: string, password: string, rememberMe = false): Promise<{ error: string } | never> {
+  const supabase = await createClient({ rememberMe });
 
   const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 

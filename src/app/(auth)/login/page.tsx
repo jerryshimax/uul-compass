@@ -16,6 +16,7 @@ const ERROR_MESSAGES: Record<string, string> = {
 function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const searchParams = useSearchParams();
@@ -28,7 +29,7 @@ function LoginForm() {
     setLoading(true);
     setError(null);
 
-    const result = await loginAction(email, password);
+    const result = await loginAction(email, password, rememberMe);
     if (result?.error) {
       setError(ERROR_MESSAGES[result.error] ?? result.error);
       setLoading(false);
@@ -67,6 +68,15 @@ function LoginForm() {
             className="h-11 pl-10 text-sm"
           />
         </div>
+        <label className="flex items-center gap-2 cursor-pointer select-none">
+          <input
+            type="checkbox"
+            checked={rememberMe}
+            onChange={(e) => setRememberMe(e.target.checked)}
+            className="h-4 w-4 rounded border-border accent-primary cursor-pointer"
+          />
+          <span className="text-xs text-muted-foreground">Remember me</span>
+        </label>
         <Button
           type="submit"
           disabled={loading}
