@@ -1,10 +1,10 @@
 "use client";
 
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useRef, useEffect } from "react";
 import { useLanguage } from "@/lib/i18n/context";
 import { logoutAction } from "@/lib/actions/auth";
+import { RippleLink, RippleButton } from "@/hooks/use-ripple";
 
 type UserProps = { fullName: string; email: string; role: string } | null;
 
@@ -62,7 +62,7 @@ export function SideNav({ user, isOpen = false, onClose }: { user: UserProps; is
           {allNav.map((item) => {
             const isActive = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
             return (
-              <Link
+              <RippleLink
                 key={item.href}
                 href={item.href}
                 onClick={onClose}
@@ -76,10 +76,10 @@ export function SideNav({ user, isOpen = false, onClose }: { user: UserProps; is
                   {item.icon}
                 </span>
                 <span className="font-sans text-sm font-light tracking-wide">{t(item.labelKey)}</span>
-              </Link>
+              </RippleLink>
             );
           })}
-          <Link
+          <RippleLink
             href="/my-tasks"
             onClick={onClose}
             className={`flex items-center gap-3 px-4 py-2.5 mx-0 rounded-lg text-sm font-semibold tracking-wide transition-all ${
@@ -92,7 +92,7 @@ export function SideNav({ user, isOpen = false, onClose }: { user: UserProps; is
               assignment_turned_in
             </span>
             {t("nav_myTasks")}
-          </Link>
+          </RippleLink>
         </nav>
       </div>
 
@@ -123,13 +123,13 @@ export function SideNav({ user, isOpen = false, onClose }: { user: UserProps; is
         </div>
 
         {/* Logout */}
-        <button
+        <RippleButton
           onClick={() => logoutAction()}
           className="flex items-center gap-3 px-4 py-2 w-full text-slate-500 hover:text-red-400 transition-all"
         >
           <span className="material-symbols-outlined">logout</span>
           <span className="font-sans text-sm font-light tracking-wide">{t("nav_logout")}</span>
-        </button>
+        </RippleButton>
       </div>
     </aside>
     </>
