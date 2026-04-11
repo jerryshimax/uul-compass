@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useLanguage } from "@/lib/i18n/context";
 import type { PhaseData, DecisionGate, TaskData, FinancialPulseMetric, PillarMetric } from "@/lib/data";
 
@@ -195,7 +196,11 @@ export function DashboardContent({
         ) : (
           <div className="space-y-3">
             {attentionItems.slice(0, 8).map((item) => (
-              <div key={item.id} className={`rounded-lg bg-[#131b2d] border-l-2 ${item.borderColor} p-4`}>
+              <Link
+                key={item.id}
+                href={item.type === "task" ? `/tasks/${item.id}` : "/decisions"}
+                className={`block rounded-lg bg-[#131b2d] border-l-2 ${item.borderColor} p-4 hover:bg-[#1a2540] transition-colors`}
+              >
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
                     <div className="flex items-center gap-2 mb-1">
@@ -221,7 +226,7 @@ export function DashboardContent({
                     <div className="h-2 w-2 rounded-full shrink-0 mt-2" style={{ backgroundColor: item.workstreamColor }} />
                   )}
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         )}
