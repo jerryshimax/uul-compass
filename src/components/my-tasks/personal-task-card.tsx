@@ -1,7 +1,7 @@
 "use client";
 
 import { cn, isOverdue, formatDueDate } from "@/lib/utils";
-import { Calendar, Globe } from "lucide-react";
+import { Calendar } from "lucide-react";
 import type { TaskData } from "@/lib/data/types";
 
 const priorityConfig = {
@@ -61,7 +61,7 @@ export function PersonalTaskCard({ task }: { task: TaskData }) {
         )}
       />
 
-      {/* Top row: task code + priority + cross-office */}
+      {/* Top row: task code + priority */}
       <div className="flex items-center gap-2 mb-2.5 pl-2">
         <span className="font-mono text-xs font-semibold text-muted-foreground">
           {task.taskCode}
@@ -76,12 +76,6 @@ export function PersonalTaskCard({ task }: { task: TaskData }) {
         >
           {p.label}
         </span>
-        {task.isCrossOffice && (
-          <span className="inline-flex items-center gap-1 rounded-full bg-cyan-500/15 text-cyan-400 border border-cyan-500/30 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider">
-            <Globe className="h-2.5 w-2.5" />
-            Cross-office
-          </span>
-        )}
       </div>
 
       {/* Title */}

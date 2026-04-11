@@ -149,6 +149,59 @@ export const getTasks = cache(async (): Promise<TaskData[]> => {
   }));
 });
 
+export async function getTaskById(id: string): Promise<TaskData | null> {
+  const rows = await db
+    .select({
+      t: {
+        id: pmiTasks.id,
+        taskCode: pmiTasks.taskCode,
+        title: pmiTasks.title,
+        description: pmiTasks.description,
+        status: pmiTasks.status,
+        priority: pmiTasks.priority,
+        dueDate: pmiTasks.dueDate,
+        phase: pmiTasks.phase,
+        milestoneId: pmiTasks.milestoneId,
+        isCrossOffice: pmiTasks.isCrossOffice,
+        sortOrder: pmiTasks.sortOrder,
+        workstreamId: pmiTasks.workstreamId,
+        assigneeId: pmiTasks.assigneeId,
+      },
+      ws: {
+        name: pmiWorkstreams.name,
+        color: pmiWorkstreams.color,
+      },
+      u: {
+        fullName: users.fullName,
+      },
+    })
+    .from(pmiTasks)
+    .leftJoin(pmiWorkstreams, eq(pmiTasks.workstreamId, pmiWorkstreams.id))
+    .leftJoin(users, eq(pmiTasks.assigneeId, users.id))
+    .where(eq(pmiTasks.id, id))
+    .limit(1);
+
+  if (rows.length === 0) return null;
+  const { t, ws, u } = rows[0];
+  return {
+    id: t.id,
+    taskCode: t.taskCode ?? "",
+    title: t.title,
+    description: t.description ?? undefined,
+    status: t.status as TaskData["status"],
+    priority: t.priority as TaskData["priority"],
+    assignee: u ? { name: u.fullName, initials: makeInitials(u.fullName) } : undefined,
+    assigneeId: t.assigneeId ?? undefined,
+    dueDate: t.dueDate ?? undefined,
+    workstream: ws?.name ?? "",
+    workstreamId: t.workstreamId,
+    workstreamColor: ws?.color ?? undefined,
+    phase: (t.phase ?? 1) as 1 | 2 | 3,
+    milestoneId: t.milestoneId ?? undefined,
+    isCrossOffice: t.isCrossOffice,
+  };
+}
+
 export async function getWorkstreams(): Promise<WorkstreamData[]> {
   const [tasks, rows] = await Promise.all([
     getTasks(),

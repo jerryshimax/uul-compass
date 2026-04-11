@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import type {
   TaskData,
   WorkstreamData,
@@ -76,18 +77,17 @@ export function PlanContent({
   const [viewMode, setViewMode] = useState<"board" | "list">("board");
   const [activeStatusFilter, setActiveStatusFilter] = useState<string | null>(null);
 
-  // Modal state
+  const router = useRouter();
+
+  // Modal state (create only)
   const [modalOpen, setModalOpen] = useState(false);
-  const [modalTask, setModalTask] = useState<TaskData | null>(null);
 
   function openCreate() {
-    setModalTask(null);
     setModalOpen(true);
   }
 
   function openEdit(task: TaskData) {
-    setModalTask(task);
-    setModalOpen(true);
+    router.push(`/tasks/${task.id}`);
   }
 
   // Filter by phase + workstream
@@ -396,7 +396,7 @@ export function PlanContent({
         <TaskModal
           open={modalOpen}
           onClose={() => setModalOpen(false)}
-          task={modalTask}
+          task={null}
           workstreams={workstreams}
           userOptions={userOptions}
           currentUser={currentUser}
@@ -441,9 +441,6 @@ function TaskRow({
           {STATUS_CONFIG[task.status]?.label}
         </span>
       )}
-      {task.isCrossOffice && (
-        <span className="text-[9px] uppercase tracking-wider text-[#dfc299]/60 shrink-0">Cross</span>
-      )}
     </div>
   );
 }
@@ -476,9 +473,6 @@ function BoardCard({
         <span className="text-[10px] font-mono text-slate-600">{task.taskCode}</span>
         {isCritical && (
           <span className="text-[9px] uppercase tracking-wider text-red-400 font-semibold">{t("priority_critical")}</span>
-        )}
-        {task.isCrossOffice && (
-          <span className="text-[9px] uppercase tracking-wider text-[#dfc299]/60">Cross</span>
         )}
       </div>
       <p className={`text-[12px] leading-snug mb-2 ${isDone ? "line-through text-slate-600" : "text-slate-200"}`}>

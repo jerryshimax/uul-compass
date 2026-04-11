@@ -268,17 +268,6 @@ export function TaskModal({
             </div>
           </div>
 
-          {/* Cross-office */}
-          <label className="flex items-center gap-2.5 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={form.isCrossOffice}
-              onChange={(e) => set("isCrossOffice", e.target.checked)}
-              disabled={!canWrite || pending}
-              className="w-3.5 h-3.5 rounded accent-[#b4c5ff]"
-            />
-            <span className="text-xs text-slate-400">{t("modal_crossOffice")}</span>
-          </label>
         </div>
 
         <DialogFooter className="flex items-center gap-2 pt-2">

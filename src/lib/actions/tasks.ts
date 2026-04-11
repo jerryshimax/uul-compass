@@ -26,6 +26,7 @@ function revalidateAll() {
   revalidatePath("/");
   revalidatePath("/plan");
   revalidatePath("/my-tasks");
+  revalidatePath("/tasks", "layout");
 }
 
 export async function updateTaskStatus(taskId: string, status: TaskStatus) {

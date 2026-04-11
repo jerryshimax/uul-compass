@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import type { TaskData, WorkstreamData, UserOption } from "@/lib/data";
 import type { CurrentUser } from "@/lib/supabase/get-current-user";
 import { useLanguage } from "@/lib/i18n/context";
@@ -96,16 +97,6 @@ function TaskCode({ code }: { code: string }) {
   );
 }
 
-function CrossOfficeBadge({ task }: { task: TaskData }) {
-  const { t } = useLanguage();
-  if (!task.isCrossOffice) return null;
-  return (
-    <span className="inline-flex items-center gap-1 rounded-full bg-[#1e2a42] px-2.5 py-0.5 text-[10px] text-slate-400 uppercase tracking-wider">
-      <span className="material-symbols-outlined text-xs">public</span>
-      {t("tasks_crossOffice")}
-    </span>
-  );
-}
 
 function PriorityBadge({ priority }: { priority: string }) {
   const { t } = useLanguage();
@@ -169,7 +160,7 @@ function OverdueCard({ task, onEdit }: { task: TaskData; onEdit: (t: TaskData) =
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 flex-wrap">
           <p className="text-lg text-blue-100 truncate">{task.title}</p>
-          <CrossOfficeBadge task={task} />
+
         </div>
         <div className="flex items-center gap-3 mt-1">
           {task.dueDate && (
@@ -197,7 +188,7 @@ function WeekCard({ task, onEdit }: { task: TaskData; onEdit: (t: TaskData) => v
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 flex-wrap">
           <p className="text-lg text-blue-100 truncate">{task.title}</p>
-          <CrossOfficeBadge task={task} />
+
           <PriorityBadge priority={task.priority} />
         </div>
         <div className="flex items-center gap-3 mt-1">
@@ -226,7 +217,7 @@ function LaterCard({ task, onEdit }: { task: TaskData; onEdit: (t: TaskData) => 
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 flex-wrap">
           <p className="text-sm text-slate-300 truncate">{task.title}</p>
-          <CrossOfficeBadge task={task} />
+
         </div>
         <div className="flex items-center gap-3 mt-1">
           {task.dueDate && (
@@ -317,12 +308,12 @@ export function MyTasksContent({ tasks, currentUser, workstreams, userOptions }:
   const { overdue, thisWeek, later, completed } = groupTasks(tasks);
   const activeTasks = tasks.filter((t) => t.status !== "done");
   const { t } = useLanguage();
+  const router = useRouter();
 
   const [modalOpen, setModalOpen] = useState(false);
-  const [modalTask, setModalTask] = useState<TaskData | null>(null);
 
-  function openCreate() { setModalTask(null); setModalOpen(true); }
-  function openEdit(task: TaskData) { setModalTask(task); setModalOpen(true); }
+  function openCreate() { setModalOpen(true); }
+  function openEdit(task: TaskData) { router.push(`/tasks/${task.id}`); }
 
   return (
     <div className="space-y-10">
@@ -415,7 +406,7 @@ export function MyTasksContent({ tasks, currentUser, workstreams, userOptions }:
         <TaskModal
           open={modalOpen}
           onClose={() => setModalOpen(false)}
-          task={modalTask}
+          task={null}
           workstreams={workstreams}
           userOptions={userOptions}
           currentUser={currentUser}
