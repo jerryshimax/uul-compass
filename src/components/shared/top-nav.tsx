@@ -17,7 +17,7 @@ function makeInitials(name: string) {
   return name.split(" ").map((p) => p[0]).filter(Boolean).join("").slice(0, 2).toUpperCase();
 }
 
-export function TopNav({ user }: { user: UserProps }) {
+export function TopNav({ user, onMenuToggle }: { user: UserProps; onMenuToggle?: () => void }) {
   const { lang, setLang } = useLanguage();
   const [notifOpen, setNotifOpen] = useState(false);
   const notifRef = useRef<HTMLDivElement>(null);
@@ -34,9 +34,18 @@ export function TopNav({ user }: { user: UserProps }) {
 
   return (
     <nav className="fixed top-0 w-full z-50 bg-slate-950 backdrop-blur-xl border-b border-slate-800/50 flex justify-between items-center px-6 h-16">
-      <Link href="/" className="font-serif text-blue-200 tracking-widest text-xl hover:text-blue-100 transition-colors">
-        UUL Global
-      </Link>
+      <div className="flex items-center gap-3">
+        <button
+          onClick={onMenuToggle}
+          className="lg:hidden text-slate-400 hover:text-slate-200 transition-colors"
+          aria-label="Toggle menu"
+        >
+          <span className="material-symbols-outlined">menu</span>
+        </button>
+        <Link href="/" className="font-serif text-blue-200 tracking-widest text-xl hover:text-blue-100 transition-colors">
+          UUL Global
+        </Link>
+      </div>
 
       <div className="flex items-center gap-4">
         <div className="relative hidden sm:block">

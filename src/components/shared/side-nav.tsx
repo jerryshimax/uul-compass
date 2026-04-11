@@ -8,10 +8,9 @@ import { logoutAction } from "@/lib/actions/auth";
 
 type UserProps = { fullName: string; email: string; role: string } | null;
 
-export function SideNav({ user }: { user: UserProps }) {
+export function SideNav({ user, isOpen = false, onClose }: { user: UserProps; isOpen?: boolean; onClose?: () => void }) {
   const pathname = usePathname();
   const { t } = useLanguage();
-  const myTasksActive = pathname.startsWith("/my-tasks");
   const [supportOpen, setSupportOpen] = useState(false);
   const supportRef = useRef<HTMLDivElement>(null);
 
@@ -25,20 +24,25 @@ export function SideNav({ user }: { user: UserProps }) {
     return () => document.removeEventListener("mousedown", handleClick);
   }, [supportOpen]);
 
-  const mainNav = [
+  const allNav = [
     { labelKey: "nav_home" as const, icon: "dashboard", href: "/" },
     { labelKey: "nav_plan" as const, icon: "event_note", href: "/plan" },
     { labelKey: "nav_growth" as const, icon: "insights", href: "/value-gains" },
     { labelKey: "nav_sales" as const, icon: "storefront", href: "/sales" },
     { labelKey: "nav_risks" as const, icon: "warning", href: "/risks" },
-  ];
-
-  const systemNav = [
     { labelKey: "nav_organization" as const, icon: "corporate_fare", href: "/settings" },
   ];
 
+  const myTasksActive = pathname.startsWith("/my-tasks");
+
   return (
-    <aside className="fixed left-0 top-0 h-full w-64 hidden lg:flex flex-col bg-slate-950 border-r border-slate-800/50 z-40 overflow-y-auto">
+    <>
+      {/* Mobile overlay */}
+      <div
+        className={`lg:hidden fixed inset-0 bg-black/60 z-30 transition-opacity duration-300 ${isOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
+        onClick={onClose}
+      />
+    <aside className={`fixed left-0 top-0 h-full w-64 flex flex-col bg-slate-950 border-r border-slate-800/50 z-40 overflow-y-auto transition-transform duration-300 ease-in-out ${isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}>
       <div className="p-6 pt-24">
         {/* Identity */}
         <div className="flex items-center gap-3 mb-8">
@@ -53,14 +57,15 @@ export function SideNav({ user }: { user: UserProps }) {
           </div>
         </div>
 
-        {/* Main Nav */}
+        {/* Nav */}
         <nav className="space-y-1">
-          {mainNav.map((item) => {
+          {allNav.map((item) => {
             const isActive = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
             return (
               <Link
                 key={item.href}
                 href={item.href}
+                onClick={onClose}
                 className={
                   isActive
                     ? "flex items-center gap-3 px-4 py-3 text-blue-200 font-semibold bg-blue-900/30 border-l-4 border-blue-500 transition-all"
@@ -74,13 +79,10 @@ export function SideNav({ user }: { user: UserProps }) {
               </Link>
             );
           })}
-        </nav>
-
-        {/* My Tasks */}
-        <div className="mt-6">
           <Link
             href="/my-tasks"
-            className={`flex items-center justify-center gap-2 w-full py-3 rounded-lg text-sm font-semibold tracking-wide transition-all ${
+            onClick={onClose}
+            className={`flex items-center gap-3 px-4 py-2.5 mx-0 rounded-lg text-sm font-semibold tracking-wide transition-all ${
               myTasksActive
                 ? "bg-[#b4c5ff] text-[#0b1325]"
                 : "bg-[#b4c5ff]/15 text-[#b4c5ff] border border-[#b4c5ff]/30 hover:bg-[#b4c5ff]/25"
@@ -91,28 +93,7 @@ export function SideNav({ user }: { user: UserProps }) {
             </span>
             {t("nav_myTasks")}
           </Link>
-        </div>
-
-        {/* System Nav */}
-        <div className="mt-6 pt-4 border-t border-slate-800/30 space-y-1">
-          {systemNav.map((item) => {
-            const isActive = pathname.startsWith(item.href);
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={
-                  isActive
-                    ? "flex items-center gap-3 px-4 py-3 text-blue-200 font-semibold bg-blue-900/30 border-l-4 border-blue-500 transition-all"
-                    : "flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-slate-300 hover:bg-slate-900 transition-all"
-                }
-              >
-                <span className="material-symbols-outlined">{item.icon}</span>
-                <span className="font-sans text-sm font-light tracking-wide">{t(item.labelKey)}</span>
-              </Link>
-            );
-          })}
-        </div>
+        </nav>
       </div>
 
       {/* Footer */}
@@ -151,5 +132,6 @@ export function SideNav({ user }: { user: UserProps }) {
         </button>
       </div>
     </aside>
+    </>
   );
 }
