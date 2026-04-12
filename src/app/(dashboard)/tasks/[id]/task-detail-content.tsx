@@ -310,6 +310,8 @@ export function TaskDetailContent({
   const canWrite = !!currentUser && (currentUser.isAdmin || currentUser.isContributor);
   const canDelete = !!currentUser && currentUser.isAdmin;
 
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
+
   const [form, setForm] = useState({
     title: task.title,
     description: task.description ?? "",
@@ -506,9 +508,21 @@ export function TaskDetailContent({
       {/* ── Form actions ─────────────────────────────────────────── */}
       <div className="flex items-center gap-3 border-t border-slate-700/40 pt-4">
         {canDelete && (
-          <Button variant="destructive" size="sm" onClick={handleDelete} disabled={pending} className="text-xs h-9">
-            {t("modal_delete")}
-          </Button>
+          confirmingDelete ? (
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-slate-400">{t("modal_deleteConfirm")}</span>
+              <Button variant="destructive" size="sm" onClick={handleDelete} disabled={pending} className="text-xs h-9">
+                {t("modal_deleteYes")}
+              </Button>
+              <Button variant="outline" size="sm" onClick={() => setConfirmingDelete(false)} disabled={pending} className="text-xs h-9 border-slate-700">
+                {t("modal_cancel")}
+              </Button>
+            </div>
+          ) : (
+            <Button variant="destructive" size="sm" onClick={() => setConfirmingDelete(true)} disabled={pending} className="text-xs h-9">
+              {t("modal_delete")}
+            </Button>
+          )
         )}
         <div className="flex-1" />
         <Button variant="outline" size="sm" onClick={() => router.back()} disabled={pending} className="text-xs h-9 border-slate-700">
