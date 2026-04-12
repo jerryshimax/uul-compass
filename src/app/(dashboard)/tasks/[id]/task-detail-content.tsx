@@ -308,7 +308,10 @@ export function TaskDetailContent({
   const [pending, startTransition] = useTransition();
 
   const canWrite = !!currentUser && (currentUser.isAdmin || currentUser.isContributor);
-  const canDelete = !!currentUser && (currentUser.isAdmin || currentUser.id === task.assigneeId);
+  // Delete is admin-only for now. To allow creators to delete their own tasks,
+  // pmi_tasks needs a created_by FK column first — assigneeId alone isn't safe
+  // because an assignee didn't necessarily create the task.
+  const canDelete = !!currentUser && currentUser.isAdmin;
 
   const [confirmingDelete, setConfirmingDelete] = useState(false);
 
