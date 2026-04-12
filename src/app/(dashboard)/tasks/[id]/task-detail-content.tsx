@@ -511,11 +511,11 @@ export function TaskDetailContent({
           confirmingDelete ? (
             <div className="flex items-center gap-2">
               <span className="text-xs text-slate-400">{t("modal_deleteConfirm")}</span>
-              <Button variant="destructive" size="sm" onClick={handleDelete} disabled={pending} className="text-xs h-9">
-                {t("modal_deleteYes")}
-              </Button>
-              <Button variant="outline" size="sm" onClick={() => setConfirmingDelete(false)} disabled={pending} className="text-xs h-9 border-slate-700">
+              <Button variant="outline" size="sm" onClick={() => setConfirmingDelete(false)} disabled={pending} className="text-xs h-9">
                 {t("modal_cancel")}
+              </Button>
+              <Button variant="destructive" size="sm" onClick={handleDelete} disabled={pending} className="text-xs h-9 opacity-60 hover:opacity-100">
+                {t("modal_deleteYes")}
               </Button>
             </div>
           ) : (
