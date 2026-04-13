@@ -10,6 +10,9 @@ export const userRoleEnum = pgEnum("user_role", [
   "manager",
   "operator",
   "sales",
+  "customer_service",
+  "procurement",
+  "operations",
   "finance",
   "compliance",
   "viewer",
@@ -340,4 +343,103 @@ export const riskStatusEnum = pgEnum("risk_status", [
   "open",
   "mitigating",
   "resolved",
+]);
+
+// ─── AI ─────────────────────────────────────────────────────────
+export const aiMessageRoleEnum = pgEnum("ai_message_role", [
+  "system",
+  "user",
+  "assistant",
+  "tool",
+]);
+
+export const aiToolStatusEnum = pgEnum("ai_tool_status", [
+  "pending",
+  "confirmed",
+  "rejected",
+  "executed",
+  "failed",
+]);
+
+// Vercel AI Gateway model slugs ("provider/model" with dots for versions)
+export const aiModelEnum = pgEnum("ai_model", [
+  "anthropic/claude-opus-4.6",
+  "anthropic/claude-sonnet-4.6",
+  "anthropic/claude-haiku-4.5",
+  "openai/gpt-5.4",
+  "openai/gpt-5.4-pro",
+  "openai/text-embedding-3-small",
+]);
+
+// ─── Cross-Border Workflows ────────────────────────────────────
+export const handoffStatusEnum = pgEnum("handoff_status", [
+  "sent",
+  "seen",
+  "acknowledged",
+  "in_progress",
+  "completed",
+  "declined",
+  "cancelled",
+]);
+
+export const handoffUrgencyEnum = pgEnum("handoff_urgency", [
+  "low",
+  "medium",
+  "high",
+  "urgent",
+]);
+
+export const watchTypeEnum = pgEnum("watch_type", [
+  "any_change",
+  "major_only",
+  "mentions_only",
+]);
+
+export const notificationKindEnum = pgEnum("notification_kind", [
+  "handoff_received",
+  "handoff_status_changed",
+  "mention",
+  "watch_alert",
+  "ai_insight",
+  "system",
+]);
+
+// ─── Sales Pipeline ────────────────────────────────────────────
+export const opportunityStageEnum = pgEnum("opportunity_stage", [
+  "lead",
+  "qualified",
+  "quoted",
+  "negotiating",
+  "won",
+  "lost",
+]);
+
+export const demandConfidenceEnum = pgEnum("demand_confidence", [
+  "low",
+  "medium",
+  "high",
+]);
+
+// ─── Carrier Contracts ─────────────────────────────────────────
+export const carrierContractStatusEnum = pgEnum("carrier_contract_status", [
+  "in_negotiation",
+  "active",
+  "expired",
+  "terminated",
+]);
+
+// ─── Feedback ──────────────────────────────────────────────────
+export const feedbackTypeEnum = pgEnum("feedback_type", [
+  "bug",
+  "idea",
+  "question",
+  "praise",
+]);
+
+export const feedbackStatusEnum = pgEnum("feedback_status", [
+  "open",
+  "triaged",
+  "in_progress",
+  "resolved",
+  "wont_fix",
 ]);
