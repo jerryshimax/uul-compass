@@ -598,6 +598,203 @@ export async function execWatchEntity(
   return { ok: true, data: { watching: true } };
 }
 
+export async function execUpdateTask(
+  args: {
+    taskId: string;
+    status?: "todo" | "in_progress" | "blocked" | "review" | "done";
+    priority?: "critical" | "high" | "medium" | "low";
+    assigneeId?: string;
+    dueDate?: string;
+    progress?: number;
+    notes?: string;
+  },
+  ctx: ExecutorContext,
+): Promise<ExecutorResult<{ taskId: string }>> {
+  checkToolPermission(ctx.user, "update_task", args);
+
+  // Fetch task first to verify entity access (tasks inherit entity via workstream)
+  const [existing] = await db
+    .select({ id: pmiTasks.id })
+    .from(pmiTasks)
+    .where(eq(pmiTasks.id, args.taskId))
+    .limit(1);
+  if (!existing) return { ok: false, error: "Task not found" };
+
+  const updates: Record<string, unknown> = {};
+  if (args.status !== undefined) updates.status = args.status;
+  if (args.priority !== undefined) updates.priority = args.priority;
+  if (args.assigneeId !== undefined) updates.assigneeId = args.assigneeId;
+  if (args.dueDate !== undefined) updates.dueDate = new Date(args.dueDate);
+  if (args.progress !== undefined) updates.progress = args.progress;
+  if (args.notes !== undefined) updates.notes = args.notes;
+  updates.updatedAt = new Date();
+
+  await db.update(pmiTasks).set(updates).where(eq(pmiTasks.id, args.taskId));
+
+  return {
+    ok: true,
+    data: { taskId: args.taskId },
+    citations: [{ type: "db", id: args.taskId, label: "Updated task", url: `/tasks/${args.taskId}` }],
+  };
+}
+
+export async function execCreateRisk(
+  args: {
+    title: string;
+    description?: string;
+    severity: "high" | "medium" | "low";
+    ownerId?: string;
+    workstreamId?: string;
+    mitigationPlan?: string;
+    targetDate?: string;
+    entityId: string;
+  },
+  ctx: ExecutorContext,
+): Promise<ExecutorResult<{ riskId: string }>> {
+  checkToolPermission(ctx.user, "create_risk", args);
+  requireEntityWrite(ctx.user, args.entityId);
+
+  const [row] = await db
+    .insert(risks)
+    .values({
+      title: args.title,
+      description: args.description,
+      severity: args.severity,
+      status: "open",
+      ownerId: args.ownerId ?? ctx.user.id,
+      workstreamId: args.workstreamId ?? null,
+      mitigationPlan: args.mitigationPlan,
+      targetDate: args.targetDate ? new Date(args.targetDate) : null,
+      raisedDate: new Date(),
+    })
+    .returning({ id: risks.id });
+
+  return {
+    ok: true,
+    data: { riskId: row.id },
+    citations: [{ type: "db", id: row.id, label: `Risk: ${args.title}`, url: `/risks/${row.id}` }],
+  };
+}
+
+export async function execUpdateRisk(
+  args: {
+    riskId: string;
+    severity?: "high" | "medium" | "low";
+    status?: "open" | "mitigating" | "resolved";
+    mitigationPlan?: string;
+    notes?: string;
+  },
+  ctx: ExecutorContext,
+): Promise<ExecutorResult<{ riskId: string }>> {
+  checkToolPermission(ctx.user, "update_risk", args);
+
+  const [existing] = await db
+    .select({ id: risks.id })
+    .from(risks)
+    .where(eq(risks.id, args.riskId))
+    .limit(1);
+  if (!existing) return { ok: false, error: "Risk not found" };
+
+  const updates: Record<string, unknown> = {};
+  if (args.severity !== undefined) updates.severity = args.severity;
+  if (args.status !== undefined) {
+    updates.status = args.status;
+    if (args.status === "resolved") updates.resolvedDate = new Date();
+  }
+  if (args.mitigationPlan !== undefined) updates.mitigationPlan = args.mitigationPlan;
+  if (args.notes !== undefined) updates.notes = args.notes;
+  updates.updatedAt = new Date();
+
+  await db.update(risks).set(updates).where(eq(risks.id, args.riskId));
+
+  return {
+    ok: true,
+    data: { riskId: args.riskId },
+    citations: [{ type: "db", id: args.riskId, label: "Updated risk", url: `/risks/${args.riskId}` }],
+  };
+}
+
+export async function execUpdateOpportunityStage(
+  args: {
+    opportunityId: string;
+    newStage: "lead" | "qualified" | "quoted" | "negotiating" | "won" | "lost";
+    notes?: string;
+  },
+  ctx: ExecutorContext,
+): Promise<ExecutorResult<{ opportunityId: string }>> {
+  checkToolPermission(ctx.user, "update_opportunity_stage", args);
+
+  const [existing] = await db
+    .select({ id: opportunities.id, entityId: opportunities.entityId })
+    .from(opportunities)
+    .where(eq(opportunities.id, args.opportunityId))
+    .limit(1);
+  if (!existing) return { ok: false, error: "Opportunity not found" };
+  requireEntityWrite(ctx.user, existing.entityId);
+
+  await db
+    .update(opportunities)
+    .set({
+      stage: args.newStage,
+      stageChangedAt: new Date(),
+      updatedAt: new Date(),
+      ...(args.newStage === "won"
+        ? { wonValueCents: null /* caller should update separately */ }
+        : {}),
+    })
+    .where(eq(opportunities.id, args.opportunityId));
+
+  return {
+    ok: true,
+    data: { opportunityId: args.opportunityId },
+    citations: [
+      {
+        type: "db",
+        id: args.opportunityId,
+        label: `Opportunity → ${args.newStage}`,
+        url: `/pipeline/opportunities/${args.opportunityId}`,
+      },
+    ],
+  };
+}
+
+export async function execUpdateOfficeStatus(
+  args: {
+    officeId: string;
+    currentFocus: string;
+    capacityIndicator: "green" | "yellow" | "red";
+    blockers?: string;
+  },
+  ctx: ExecutorContext,
+): Promise<ExecutorResult> {
+  checkToolPermission(ctx.user, "update_office_status", args);
+
+  // Upsert — one status per office
+  await db
+    .insert(officeStatus)
+    .values({
+      officeId: args.officeId,
+      currentFocus: args.currentFocus,
+      capacityIndicator: args.capacityIndicator,
+      blockers: args.blockers,
+      setByUserId: ctx.user.id,
+      setAt: new Date(),
+    })
+    .onConflictDoUpdate({
+      target: [officeStatus.officeId],
+      set: {
+        currentFocus: args.currentFocus,
+        capacityIndicator: args.capacityIndicator,
+        blockers: args.blockers,
+        setByUserId: ctx.user.id,
+        setAt: new Date(),
+        updatedAt: new Date(),
+      },
+    });
+
+  return { ok: true, data: { officeId: args.officeId } };
+}
+
 // ─── Registry: tool name → executor function ───────────────────
 // Used by /api/ai/chat (for inline read execution) and
 // /api/ai/tool/execute (for confirmed write execution).
@@ -615,12 +812,17 @@ export const READ_EXECUTORS = {
 
 export const WRITE_EXECUTORS = {
   create_task: execCreateTask,
+  update_task: execUpdateTask,
+  create_risk: execCreateRisk,
+  update_risk: execUpdateRisk,
   create_opportunity: execCreateOpportunity,
+  update_opportunity_stage: execUpdateOpportunityStage,
   log_demand_signal: execLogDemandSignal,
   draft_handoff: execDraftHandoff,
+  update_office_status: execUpdateOfficeStatus,
   watch_entity: execWatchEntity,
-  // TODO: update_task, update_risk, create_risk, log_decision,
-  //       update_opportunity_stage, update_office_status
+  // TODO: log_decision — requires a generic decisions table
+  //       (currently governance.ts has only PMI-specific decision gates).
 } as const;
 
 export type ReadToolName = keyof typeof READ_EXECUTORS;
