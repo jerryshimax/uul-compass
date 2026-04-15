@@ -15,6 +15,13 @@
       "when": 1776193754790,
       "tag": "0001_first_multiple_man",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1776295016520,
+      "tag": "0002_fast_karma",
+      "breakpoints": true
     }
   ]
 }

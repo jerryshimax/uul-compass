@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { createClient } from "@/lib/supabase/server";
 import { db } from "@/db";
-import { conversations, chatMessages } from "@/db/schema/ai";
+import { conversations, chatMessages, aiUsage } from "@/db/schema/ai";
 import { users } from "@/db/schema/org";
 import { eq } from "drizzle-orm";
 import { buildSystemPrompt, type PageContext } from "@/lib/ai/system-prompt";
@@ -150,6 +150,10 @@ export async function POST(req: NextRequest) {
 
       try {
         let currentMessages = claudeMessages;
+        let totalInputTokens = 0;
+        let totalOutputTokens = 0;
+        let totalCacheReadTokens = 0;
+        let totalCacheWriteTokens = 0;
 
         // Agentic loop — keeps running until no more tool calls
         while (true) {
@@ -173,7 +177,14 @@ export async function POST(req: NextRequest) {
           let curToolInput = "";
 
           for await (const event of response) {
-            if (event.type === "content_block_start") {
+            if (event.type === "message_start") {
+              const u = event.message.usage;
+              totalInputTokens += u.input_tokens ?? 0;
+              totalCacheReadTokens += (u as any).cache_read_input_tokens ?? 0;
+              totalCacheWriteTokens += (u as any).cache_creation_input_tokens ?? 0;
+            } else if (event.type === "message_delta" && (event as any).usage) {
+              totalOutputTokens += (event as any).usage.output_tokens ?? 0;
+            } else if (event.type === "content_block_start") {
               if (event.content_block.type === "tool_use") {
                 curToolName = event.content_block.name;
                 curToolId = event.content_block.id;
@@ -276,6 +287,17 @@ export async function POST(req: NextRequest) {
           .set({ lastMessageAt: new Date() })
           .where(eq(conversations.id, convId!))
           .catch(() => {});
+
+        // ── Log token usage ───────────────────────────────────────────────
+        await db.insert(aiUsage).values({
+          userId,
+          conversationId: convId,
+          model: "claude-sonnet-4-6",
+          inputTokens: totalInputTokens,
+          outputTokens: totalOutputTokens,
+          cacheReadTokens: totalCacheReadTokens,
+          cacheWriteTokens: totalCacheWriteTokens,
+        }).catch(() => {});
 
         emit({ type: "done", conversationId: convId });
       } catch (err) {

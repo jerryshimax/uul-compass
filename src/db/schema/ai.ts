@@ -9,6 +9,7 @@ import {
   index,
 } from "drizzle-orm/pg-core";
 import { chatRoleEnum, chatStatusEnum, draftStatusEnum } from "./enums";
+import { users } from "./org";
 
 export const conversations = pgTable(
   "conversations",
@@ -29,6 +30,25 @@ export const conversations = pgTable(
   (table) => [
     index("idx_conversations_status").on(table.status),
     index("idx_conversations_last_msg").on(table.lastMessageAt),
+  ]
+);
+
+export const aiUsage = pgTable(
+  "ai_usage",
+  {
+    id: uuid().defaultRandom().primaryKey(),
+    userId: uuid("user_id").references(() => users.id).notNull(),
+    conversationId: uuid("conversation_id").references(() => conversations.id, { onDelete: "set null" }),
+    model: varchar({ length: 50 }).notNull(),
+    inputTokens: integer("input_tokens").notNull().default(0),
+    outputTokens: integer("output_tokens").notNull().default(0),
+    cacheReadTokens: integer("cache_read_tokens").notNull().default(0),
+    cacheWriteTokens: integer("cache_write_tokens").notNull().default(0),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_ai_usage_user").on(table.userId),
+    index("idx_ai_usage_created").on(table.createdAt),
   ]
 );
 
