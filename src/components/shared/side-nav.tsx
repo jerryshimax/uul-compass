@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { useLanguage } from "@/lib/i18n/context";
 import { logoutAction } from "@/lib/actions/auth";
 
@@ -24,13 +25,10 @@ export function SideNav({ user, isOpen = false, onClose }: { user: UserProps; is
       if (supportRef.current && !supportRef.current.contains(e.target as Node)) {
         setSupportOpen(false);
       }
-      if (feedbackRef.current && !feedbackRef.current.contains(e.target as Node)) {
-        setFeedbackOpen(false);
-      }
     }
-    if (supportOpen || feedbackOpen) document.addEventListener("mousedown", handleClick);
+    if (supportOpen) document.addEventListener("mousedown", handleClick);
     return () => document.removeEventListener("mousedown", handleClick);
-  }, [supportOpen, feedbackOpen]);
+  }, [supportOpen]);
 
   async function submitFeedback() {
     if (!feedbackText.trim()) return;
@@ -63,7 +61,7 @@ export function SideNav({ user, isOpen = false, onClose }: { user: UserProps; is
     { labelKey: "nav_people" as const, icon: "group", href: "/people" },
   ];
 
-  return (
+  const nav = (
     <>
       {/* Mobile overlay */}
       <div
@@ -113,7 +111,7 @@ export function SideNav({ user, isOpen = false, onClose }: { user: UserProps; is
       {/* Footer */}
       <div className="mt-auto p-6 border-t border-slate-800/50 space-y-1">
         {/* Feedback */}
-        <div className="relative" ref={feedbackRef}>
+        <div ref={feedbackRef}>
           <button
             onClick={() => { setFeedbackOpen((v) => !v); setSupportOpen(false); }}
             className="flex items-center gap-3 px-4 py-2 w-full text-slate-500 hover:text-slate-300 transition-all"
@@ -121,50 +119,8 @@ export function SideNav({ user, isOpen = false, onClose }: { user: UserProps; is
             <span className="material-symbols-outlined">chat_bubble_outline</span>
             <span className="font-sans text-sm font-light tracking-wide">{t("nav_feedback")}</span>
           </button>
-          {feedbackOpen && (
-            <div className="absolute bottom-12 left-0 w-64 bg-slate-900 border border-slate-800 rounded-xl shadow-2xl shadow-black/40 p-4">
-              {feedbackStatus === "sent" ? (
-                <div className="flex flex-col items-center gap-2 py-2">
-                  <span className="material-symbols-outlined text-emerald-400">check_circle</span>
-                  <p className="text-xs text-emerald-400 font-medium">Thanks for your feedback!</p>
-                </div>
-              ) : (
-                <>
-                  <p className="text-xs font-semibold text-slate-300 mb-3">Send Feedback</p>
-                  <div className="flex gap-1 mb-3">
-                    {(["bug", "idea", "question", "praise"] as const).map((type) => (
-                      <button
-                        key={type}
-                        onClick={() => setFeedbackType(type)}
-                        className={`flex-1 py-1 rounded text-[10px] font-medium capitalize transition-colors ${
-                          feedbackType === type
-                            ? "bg-[#b4c5ff]/20 text-[#b4c5ff]"
-                            : "text-slate-500 hover:text-slate-300"
-                        }`}
-                      >
-                        {type}
-                      </button>
-                    ))}
-                  </div>
-                  <textarea
-                    value={feedbackText}
-                    onChange={(e) => setFeedbackText(e.target.value)}
-                    placeholder="What's on your mind?"
-                    rows={3}
-                    className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 placeholder-slate-600 resize-none focus:outline-none focus:border-slate-600 mb-3"
-                  />
-                  <button
-                    onClick={submitFeedback}
-                    disabled={!feedbackText.trim() || feedbackStatus === "sending"}
-                    className="w-full py-1.5 rounded-lg bg-[#b4c5ff]/15 text-[#b4c5ff] text-xs font-medium hover:bg-[#b4c5ff]/25 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-                  >
-                    {feedbackStatus === "sending" ? "Sending…" : "Send"}
-                  </button>
-                </>
-              )}
-            </div>
-          )}
         </div>
+
 
         {/* Support */}
         <div className="relative" ref={supportRef}>
@@ -200,6 +156,96 @@ export function SideNav({ user, isOpen = false, onClose }: { user: UserProps; is
         </button>
       </div>
     </aside>
+    </>
+  );
+
+  return (
+    <>
+      {nav}
+      {feedbackOpen && typeof document !== "undefined" && createPortal(
+        <div style={{ position: "fixed", inset: 0, zIndex: 9999 }}>
+          {/* Backdrop */}
+          <div
+            style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.75)" }}
+            onClick={() => setFeedbackOpen(false)}
+          />
+          {/* Modal */}
+          <div style={{
+            position: "fixed",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: "min(560px, calc(100vw - 2rem))",
+            zIndex: 10000,
+          }} className="bg-[#0f1829] border border-slate-700/60 rounded-2xl shadow-2xl shadow-black/70 overflow-hidden">
+            {feedbackStatus === "sent" ? (
+              <div className="flex flex-col items-center gap-4 py-16">
+                <span className="material-symbols-outlined text-emerald-400" style={{ fontSize: 48 }}>check_circle</span>
+                <p className="text-base text-emerald-400 font-medium">Thanks — we&apos;ll look into it.</p>
+              </div>
+            ) : (
+              <>
+                <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-slate-800/60">
+                  <div className="flex items-center gap-3">
+                    <span className="material-symbols-outlined text-[#b4c5ff]">chat_bubble_outline</span>
+                    <h2 className="font-serif text-xl text-white">Send Feedback</h2>
+                  </div>
+                  <button onClick={() => setFeedbackOpen(false)} className="text-slate-600 hover:text-slate-300 transition-colors">
+                    <span className="material-symbols-outlined">close</span>
+                  </button>
+                </div>
+                <div className="p-6 space-y-5">
+                  <div className="grid grid-cols-4 gap-2">
+                    {([
+                      { key: "bug",      icon: "bug_report",   label: "Bug",      desc: "Something is broken" },
+                      { key: "idea",     icon: "lightbulb",    label: "Idea",     desc: "Feature or improvement" },
+                      { key: "question", icon: "help_outline", label: "Question", desc: "I need help" },
+                      { key: "praise",   icon: "thumb_up",     label: "Praise",   desc: "Something I love" },
+                    ] as const).map(({ key, icon, label, desc }) => (
+                      <button
+                        key={key}
+                        onClick={() => setFeedbackType(key)}
+                        className={`flex flex-col items-center gap-1.5 py-3 px-2 rounded-xl border transition-all ${
+                          feedbackType === key
+                            ? "bg-[#1a2744] border-[#b4c5ff]/40 text-[#b4c5ff]"
+                            : "bg-[#131b2d] border-slate-800 text-slate-500 hover:border-slate-700 hover:text-slate-300"
+                        }`}
+                      >
+                        <span className="material-symbols-outlined text-xl" style={feedbackType === key ? { fontVariationSettings: "'FILL' 1" } : undefined}>
+                          {icon}
+                        </span>
+                        <span className="text-xs font-semibold">{label}</span>
+                        <span className="text-[11px] opacity-60 leading-tight text-center">{desc}</span>
+                      </button>
+                    ))}
+                  </div>
+                  <textarea
+                    value={feedbackText}
+                    onChange={(e) => setFeedbackText(e.target.value)}
+                    placeholder={
+                      feedbackType === "bug"      ? "What happened? What did you expect?" :
+                      feedbackType === "idea"     ? "Describe the feature or improvement..." :
+                      feedbackType === "question" ? "What do you need help with?" :
+                      "What are you enjoying?"
+                    }
+                    rows={5}
+                    autoFocus
+                    className="w-full bg-[#131b2d] border border-slate-700/60 rounded-xl px-4 py-3 text-sm text-slate-200 placeholder-slate-600 resize-none focus:outline-none focus:border-slate-600 leading-relaxed"
+                  />
+                  <button
+                    onClick={submitFeedback}
+                    disabled={!feedbackText.trim() || feedbackStatus === "sending"}
+                    className="w-full py-3 rounded-xl bg-[#b4c5ff]/15 text-[#b4c5ff] text-sm font-medium hover:bg-[#b4c5ff]/25 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                  >
+                    {feedbackStatus === "sending" ? "Sending…" : "Send Feedback"}
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>,
+        document.body
+      )}
     </>
   );
 }

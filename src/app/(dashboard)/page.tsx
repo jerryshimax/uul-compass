@@ -9,7 +9,6 @@ import {
   getCurrentDay,
   getTasks,
   getWorkstreams,
-  getUsers,
 } from "@/lib/data";
 import { getCurrentUser } from "@/lib/supabase/get-current-user";
 import { DashboardContent } from "./dashboard-content";
@@ -26,7 +25,6 @@ export default async function DashboardPage() {
     allTasks,
     workstreams,
     currentUser,
-    userOptions,
   ] = await Promise.all([
     getTaskStats(),
     getPhases(),
@@ -37,7 +35,6 @@ export default async function DashboardPage() {
     getTasks(),
     getWorkstreams(),
     getCurrentUser(),
-    getUsers(),
   ]);
   const pillars = getPillarScorecard();
   const financialPulse = getFinancialPulse();
@@ -94,8 +91,6 @@ export default async function DashboardPage() {
       myTasks={myTasks}
       allTasks={allTasks}
       workstreams={workstreams}
-      currentUser={currentUser}
-      userOptions={userOptions}
     />
   );
 }
