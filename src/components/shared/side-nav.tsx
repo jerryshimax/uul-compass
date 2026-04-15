@@ -9,6 +9,8 @@ import { logoutAction } from "@/lib/actions/auth";
 
 type UserProps = { fullName: string; email: string; role: string } | null;
 
+const ADMIN_ROLES = new Set(["owner", "board", "executive"]);
+
 export function SideNav({ user, isOpen = false, onClose }: { user: UserProps; isOpen?: boolean; onClose?: () => void }) {
   const pathname = usePathname();
   const { t } = useLanguage();
@@ -51,6 +53,8 @@ export function SideNav({ user, isOpen = false, onClose }: { user: UserProps; is
     }
   }
 
+  const isAdmin = user ? ADMIN_ROLES.has(user.role) : false;
+
   const allNav = [
     { labelKey: "nav_home" as const, icon: "dashboard", href: "/" },
     { labelKey: "nav_chat" as const, icon: "assistant", href: "/chat" },
@@ -59,6 +63,7 @@ export function SideNav({ user, isOpen = false, onClose }: { user: UserProps; is
     { labelKey: "nav_pipeline" as const, icon: "timeline", href: "/pipeline" },
     { labelKey: "nav_risks" as const, icon: "warning", href: "/risks" },
     { labelKey: "nav_people" as const, icon: "group", href: "/people" },
+    ...(isAdmin ? [{ labelKey: "nav_admin" as const, icon: "admin_panel_settings", href: "/admin" }] : []),
   ];
 
   const nav = (
