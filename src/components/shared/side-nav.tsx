@@ -39,7 +39,7 @@ export function SideNav({ user, isOpen = false, onClose }: { user: UserProps; is
       await fetch("/api/feedback", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type: feedbackType, message: feedbackText }),
+        body: JSON.stringify({ type: feedbackType, body: feedbackText }),
       });
       setFeedbackStatus("sent");
       setTimeout(() => {
