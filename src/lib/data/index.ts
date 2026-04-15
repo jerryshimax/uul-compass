@@ -37,6 +37,8 @@ import {
   valueSnapshots as valueSnapshotsTable,
   growthPriorities as growthPrioritiesTable,
   users,
+  departments,
+  offices,
   taskMeetings,
   meetingNotes,
   meetingAttendees,
@@ -500,6 +502,39 @@ export function getFinancialPulse() {
 }
 
 export type UserOption = { id: string; fullName: string };
+
+export type PersonData = {
+  id: string;
+  fullName: string;
+  fullNameZh: string | null;
+  title: string | null;
+  email: string;
+  role: string;
+  departmentName: string | null;
+  departmentColor: string | null;
+  officeName: string | null;
+};
+
+export async function getPeople(): Promise<PersonData[]> {
+  const rows = await db
+    .select({
+      id: users.id,
+      fullName: users.fullName,
+      fullNameZh: users.fullNameZh,
+      title: users.title,
+      email: users.email,
+      role: users.role,
+      departmentName: departments.name,
+      departmentColor: departments.color,
+      officeName: offices.name,
+    })
+    .from(users)
+    .leftJoin(departments, eq(users.departmentId, departments.id))
+    .leftJoin(offices, eq(users.officeId, offices.id))
+    .where(eq(users.isActive, true))
+    .orderBy(asc(users.fullName));
+  return rows;
+}
 
 export async function getUsers(): Promise<UserOption[]> {
   return db

@@ -12,17 +12,46 @@ export function SideNav({ user, isOpen = false, onClose }: { user: UserProps; is
   const pathname = usePathname();
   const { t } = useLanguage();
   const [supportOpen, setSupportOpen] = useState(false);
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
+  const [feedbackType, setFeedbackType] = useState<"bug" | "idea" | "question" | "praise">("idea");
+  const [feedbackText, setFeedbackText] = useState("");
+  const [feedbackStatus, setFeedbackStatus] = useState<"idle" | "sending" | "sent">("idle");
   const supportRef = useRef<HTMLDivElement>(null);
+  const feedbackRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     function handleClick(e: MouseEvent) {
       if (supportRef.current && !supportRef.current.contains(e.target as Node)) {
         setSupportOpen(false);
       }
+      if (feedbackRef.current && !feedbackRef.current.contains(e.target as Node)) {
+        setFeedbackOpen(false);
+      }
     }
-    if (supportOpen) document.addEventListener("mousedown", handleClick);
+    if (supportOpen || feedbackOpen) document.addEventListener("mousedown", handleClick);
     return () => document.removeEventListener("mousedown", handleClick);
-  }, [supportOpen]);
+  }, [supportOpen, feedbackOpen]);
+
+  async function submitFeedback() {
+    if (!feedbackText.trim()) return;
+    setFeedbackStatus("sending");
+    try {
+      await fetch("/api/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type: feedbackType, message: feedbackText }),
+      });
+      setFeedbackStatus("sent");
+      setTimeout(() => {
+        setFeedbackOpen(false);
+        setFeedbackStatus("idle");
+        setFeedbackText("");
+        setFeedbackType("idea");
+      }, 1500);
+    } catch {
+      setFeedbackStatus("idle");
+    }
+  }
 
   const allNav = [
     { labelKey: "nav_home" as const, icon: "dashboard", href: "/" },
@@ -31,7 +60,7 @@ export function SideNav({ user, isOpen = false, onClose }: { user: UserProps; is
     { labelKey: "nav_growth" as const, icon: "insights", href: "/value-gains" },
     { labelKey: "nav_pipeline" as const, icon: "timeline", href: "/pipeline" },
     { labelKey: "nav_risks" as const, icon: "warning", href: "/risks" },
-    { labelKey: "nav_organization" as const, icon: "corporate_fare", href: "/settings" },
+    { labelKey: "nav_people" as const, icon: "group", href: "/people" },
   ];
 
   return (
@@ -83,6 +112,60 @@ export function SideNav({ user, isOpen = false, onClose }: { user: UserProps; is
 
       {/* Footer */}
       <div className="mt-auto p-6 border-t border-slate-800/50 space-y-1">
+        {/* Feedback */}
+        <div className="relative" ref={feedbackRef}>
+          <button
+            onClick={() => { setFeedbackOpen((v) => !v); setSupportOpen(false); }}
+            className="flex items-center gap-3 px-4 py-2 w-full text-slate-500 hover:text-slate-300 transition-all"
+          >
+            <span className="material-symbols-outlined">chat_bubble_outline</span>
+            <span className="font-sans text-sm font-light tracking-wide">{t("nav_feedback")}</span>
+          </button>
+          {feedbackOpen && (
+            <div className="absolute bottom-12 left-0 w-64 bg-slate-900 border border-slate-800 rounded-xl shadow-2xl shadow-black/40 p-4">
+              {feedbackStatus === "sent" ? (
+                <div className="flex flex-col items-center gap-2 py-2">
+                  <span className="material-symbols-outlined text-emerald-400">check_circle</span>
+                  <p className="text-xs text-emerald-400 font-medium">Thanks for your feedback!</p>
+                </div>
+              ) : (
+                <>
+                  <p className="text-xs font-semibold text-slate-300 mb-3">Send Feedback</p>
+                  <div className="flex gap-1 mb-3">
+                    {(["bug", "idea", "question", "praise"] as const).map((type) => (
+                      <button
+                        key={type}
+                        onClick={() => setFeedbackType(type)}
+                        className={`flex-1 py-1 rounded text-[10px] font-medium capitalize transition-colors ${
+                          feedbackType === type
+                            ? "bg-[#b4c5ff]/20 text-[#b4c5ff]"
+                            : "text-slate-500 hover:text-slate-300"
+                        }`}
+                      >
+                        {type}
+                      </button>
+                    ))}
+                  </div>
+                  <textarea
+                    value={feedbackText}
+                    onChange={(e) => setFeedbackText(e.target.value)}
+                    placeholder="What's on your mind?"
+                    rows={3}
+                    className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 placeholder-slate-600 resize-none focus:outline-none focus:border-slate-600 mb-3"
+                  />
+                  <button
+                    onClick={submitFeedback}
+                    disabled={!feedbackText.trim() || feedbackStatus === "sending"}
+                    className="w-full py-1.5 rounded-lg bg-[#b4c5ff]/15 text-[#b4c5ff] text-xs font-medium hover:bg-[#b4c5ff]/25 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    {feedbackStatus === "sending" ? "Sending…" : "Send"}
+                  </button>
+                </>
+              )}
+            </div>
+          )}
+        </div>
+
         {/* Support */}
         <div className="relative" ref={supportRef}>
           <button

@@ -22,7 +22,7 @@ Compass is an internal operations OS for UUL Global — a 100-day post-acquisiti
 | `/decisions` | ✅ Live | Decision log — meetings, gates, outcomes |
 | `/risks` | ✅ Live | Risk registry linked to tasks and workstreams |
 | `/value-gains` | ✅ Live (nav hidden) | Value initiatives and growth priorities — in nav but pending Finance page to replace it |
-| `/settings` | ✅ Live | Organization — entities, leadership, offices (to be replaced by `/people`) |
+| `/people` | ✅ Live | People — board, executive team, DB team directory grouped by dept, operating entities |
 | `/tasks/[id]` | ✅ Live | Task detail — meetings, activities, comments, action items |
 | `/plan` | ✅ Live | Full phase/kanban task manager — linked from homepage "View all tasks" |
 | `/my-tasks` | ✅ Live | Personal task queue — linked from homepage "View all my tasks" |
@@ -33,8 +33,9 @@ Compass is an internal operations OS for UUL Global — a 100-day post-acquisiti
 
 **Current nav (left sidebar):**
 ```
-Home | Compass AI | Decisions | Value Gains | Pipeline | Risks | Organization
+Home | Compass AI | Decisions | Value Gains | Pipeline | Risks | People
 ```
+**Footer (nav sidebar):** Feedback (popover) | Support (popover) | Logout
 
 **Jerry's target nav (Sprint 2):**
 ```
@@ -123,6 +124,23 @@ All data is fetched server-side via async getters in `src/lib/data/index.ts`, wh
 - `src/app/(dashboard)/dashboard-content.tsx`
 - `src/lib/i18n/translations.ts` — added all new dashboard keys (en + zh)
 
+### 2026-04-14 — People page + nav feedback (Session 4)
+
+**People page (`/people`):**
+- Replaces Organization (`/settings`) in the nav
+- 4 sections: Board & Ownership (hardcoded), Executive Team (hardcoded), Team Directory (live from DB — users joined with departments + offices, grouped by department), Operating Entities (hardcoded)
+- `getPeople()` getter added to `src/lib/data/index.ts` — joins `users → departments → offices`
+
+**Feedback moved to nav:**
+- Removed floating `FeedbackButton` component (`src/components/shared/feedback-button.tsx` deleted, removed from layout)
+- Added Feedback as a footer button in the sidebar (same popover pattern as Support)
+- Popover includes: type selector (Bug/Idea/Question/Praise), textarea, Send button — posts to existing `/api/feedback`
+
+**Nav:**
+- Organization → People (`/people`)
+- Feedback + Support both in sidebar footer
+- `/settings` route still alive but removed from nav
+
 ---
 
 ## To-Do / Backlog
@@ -132,17 +150,10 @@ Items are roughly prioritized — top is most urgent or most unblocked.
 ### Near-term (unblocked)
 
 - [ ] **Nav overhaul — remaining items** (Jerry's Sprint 2 target)
-  - Drop `Value Gains` from nav (fold into Finance page when built)
-  - Drop `Organization` from nav (replace with `/people`)
+  - Drop `Value Gains` from nav once Finance page exists
   - Drop `Compass AI` from main nav or move (not in Jerry's target nav — keep floating button)
-  - Add `Finance`, `Knowledge`, `People`, `Admin` once pages exist
-  - **Rule: nav overhaul lands as one atomic change** — not piecemeal
-
-- [ ] **People page** (`/people`)
-  - Replace current `/settings` Organization page
-  - Group by department (Sales, Customer Service, Procurement, Operations, Finance, Compliance, IT, Leadership) — NOT by office
-  - Uses existing `users.department_id`
-  - Relatively straightforward — data exists in DB
+  - Add `Finance`, `Knowledge`, `Admin` once pages exist
+  - **Rule: full nav swap lands as one atomic change** — not piecemeal
 
 - [ ] **Homepage — Financial Pulse: wire "Value Captured" to real DB data**
   - `valueInitiatives.capturedImpactCents` and `plannedImpactCents` are live in DB
