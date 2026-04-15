@@ -89,7 +89,10 @@ export async function POST(
   }
 
   // ── Execute the staged action ──────────────────────────────────────────
-  const staged = (editedPayload ?? msg.draftPayload) as Record<string, any>;
+  // msg.draftPayload is a StagedAction { kind, entityType, description, payload: { action, ... } }
+  // editedPayload (from the edit form) already spreads payload fields to the top level.
+  const draftAction = msg.draftPayload as any;
+  const staged = (editedPayload ?? draftAction.payload) as Record<string, any>;
   const { action: op } = staged;
   let createdId: string | null = null;
 

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import type { ChatMessage } from "@/hooks/use-chat";
 
 export function MessageBubble({ message }: { message: ChatMessage }) {
@@ -82,6 +83,7 @@ export function MessageBubble({ message }: { message: ChatMessage }) {
                 <span className="whitespace-pre-wrap">{message.content}</span>
               ) : (
                 <ReactMarkdown
+                  remarkPlugins={[remarkGfm]}
                   components={{
                     p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
                     strong: ({ children }) => <strong className="font-semibold text-white">{children}</strong>,
@@ -116,6 +118,16 @@ export function MessageBubble({ message }: { message: ChatMessage }) {
                         {children}
                       </blockquote>
                     ),
+                    table: ({ children }) => (
+                      <div className="overflow-x-auto my-2">
+                        <table className="w-full text-xs border-collapse">{children}</table>
+                      </div>
+                    ),
+                    thead: ({ children }) => <thead className="border-b border-slate-700">{children}</thead>,
+                    tbody: ({ children }) => <tbody>{children}</tbody>,
+                    tr: ({ children }) => <tr className="border-b border-slate-800">{children}</tr>,
+                    th: ({ children }) => <th className="text-left px-3 py-1.5 font-semibold text-slate-300">{children}</th>,
+                    td: ({ children }) => <td className="px-3 py-1.5 text-slate-400">{children}</td>,
                   }}
                 >
                   {message.content}

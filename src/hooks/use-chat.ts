@@ -149,7 +149,11 @@ export function useChat(pageContext: PageContext) {
 
                 case "confirm":
                   setMessages((prev) => [
-                    ...prev,
+                    ...prev.map((m) =>
+                      m.role === "tool_call" && m.toolName === event.toolName && !m.toolOutput
+                        ? { ...m, toolOutput: true, content: `${event.toolName} complete` }
+                        : m
+                    ),
                     {
                       id: `confirm-${event.confirmId}`,
                       role: "assistant",
@@ -168,7 +172,11 @@ export function useChat(pageContext: PageContext) {
 
                 case "draft":
                   setMessages((prev) => [
-                    ...prev,
+                    ...prev.map((m) =>
+                      m.role === "tool_call" && m.toolName === event.toolName && !m.toolOutput
+                        ? { ...m, toolOutput: true, content: `${event.toolName} complete` }
+                        : m
+                    ),
                     {
                       id: `draft-${event.draftId}`,
                       role: "assistant",

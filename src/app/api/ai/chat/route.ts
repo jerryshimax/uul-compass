@@ -227,6 +227,7 @@ export async function POST(req: NextRequest) {
               if (result.staged.kind === "confirm") {
                 emit({
                   type: "confirm",
+                  toolName: toolUse.name,
                   confirmId: savedMsg.id,
                   entityType: result.staged.entityType,
                   description: result.staged.description,
@@ -235,6 +236,7 @@ export async function POST(req: NextRequest) {
               } else {
                 emit({
                   type: "draft",
+                  toolName: toolUse.name,
                   draftId: savedMsg.id,
                   entityType: result.staged.entityType,
                   description: result.staged.description,
