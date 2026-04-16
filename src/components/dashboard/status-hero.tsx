@@ -72,7 +72,7 @@ export function StatusHero({ done, active, overdue, blocked, total }: StatusHero
 
 function CountPill({ value, label, color }: { value: number; label: string; color: string }) {
   return (
-    <div className="flex flex-col items-center px-4 py-2 rounded-lg bg-card/60 min-w-[72px]">
+    <div className="flex flex-col items-center px-3 md:px-4 py-2 rounded-lg bg-card/60 min-w-[56px] md:min-w-[72px]">
       <span className={`text-2xl font-bold tabular-nums ${color}`}>{value}</span>
       <span className="text-[10px] text-muted-foreground uppercase tracking-wider mt-0.5">{label}</span>
     </div>

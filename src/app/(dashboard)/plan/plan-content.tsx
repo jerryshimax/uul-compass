@@ -424,10 +424,10 @@ export function TaskRow({
       <span className={`material-symbols-outlined text-base shrink-0 ${STATUS_CONFIG[task.status]?.color ?? "text-slate-500"}`} style={{ fontVariationSettings: "'FILL' 1" }}>
         {STATUS_CONFIG[task.status]?.icon ?? "circle"}
       </span>
-      <span className={`text-[11px] shrink-0 w-16 truncate ${isDone ? "text-slate-600" : "text-slate-400"}`}>
+      <span className={`text-[11px] shrink-0 w-12 md:w-16 truncate ${isDone ? "text-slate-600" : "text-slate-400"}`}>
         {task.assignee?.name.split(" ")[0] || "—"}
       </span>
-      <span className={`text-[10px] font-mono tabular-nums shrink-0 w-12 ${isDone ? "text-slate-600" : "text-slate-500"}`}>
+      <span className={`text-[10px] font-mono tabular-nums shrink-0 w-10 md:w-12 ${isDone ? "text-slate-600" : "text-slate-500"}`}>
         {formatDueDate(task.dueDate) || "—"}
       </span>
       <span className="text-[10px] font-mono text-slate-600 shrink-0 w-8">{task.taskCode}</span>
@@ -479,7 +479,7 @@ export function BoardCard({
         {task.title}
       </p>
       <div className="flex items-center justify-between">
-        <span className="text-[11px] text-slate-500 truncate max-w-[100px]">
+        <span className="text-[11px] text-slate-500 truncate">
           {task.assignee?.name.split(" ")[0] || "—"}
         </span>
         {task.dueDate && (

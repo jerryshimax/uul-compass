@@ -20,11 +20,11 @@ interface KanbanBoardProps {
 export function KanbanBoard({ tasks }: KanbanBoardProps) {
   return (
     <ScrollArea className="w-full">
-      <div className="flex gap-3 min-w-[1100px] pb-4">
+      <div className="flex gap-3 min-w-[900px] md:min-w-[1100px] pb-4">
         {columns.map((col) => {
           const columnTasks = tasks.filter((t) => t.status === col.key);
           return (
-            <div key={col.key} className="flex-1 min-w-[210px]">
+            <div key={col.key} className="flex-1 min-w-[180px] md:min-w-[210px]">
               {/* Column header */}
               <div className={cn(
                 "flex items-center gap-2 mb-3 px-3 py-2.5 rounded-xl border border-transparent",

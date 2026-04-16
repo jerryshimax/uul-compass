@@ -99,15 +99,15 @@ function AttentionRow({ item, t }: { item: AttentionItem; t: (k: Parameters<Retu
       className="flex items-center gap-3 px-4 py-3 hover:bg-[#171f32] active:opacity-75 transition-colors border-b border-slate-800/40 last:border-b-0 group"
     >
       {item.type === "gate" ? (
-        <span className="text-[10px] font-semibold uppercase tracking-wider text-[#dfc299] shrink-0 w-16">
+        <span className="text-[10px] font-semibold uppercase tracking-wider text-[#dfc299] shrink-0 w-14 md:w-16">
           {t("dash_gate")}
         </span>
       ) : (
-        <span className="text-[10px] font-mono text-slate-600 shrink-0 w-16 truncate">
+        <span className="text-[10px] font-mono text-slate-600 shrink-0 w-14 md:w-16 truncate">
           {item.taskCode}
         </span>
       )}
-      <span className="flex-1 text-sm text-slate-200 truncate group-hover:text-white transition-colors">
+      <span className="flex-1 min-w-0 text-sm text-slate-200 truncate group-hover:text-white transition-colors">
         {item.title}
       </span>
       <span className="text-[11px] text-slate-500 shrink-0 truncate max-w-[160px] hidden sm:block">
@@ -471,7 +471,7 @@ export function DashboardContent({
                 className={`flex items-center gap-3 px-4 py-3 ${i < wsHealth.length - 1 ? "border-b border-slate-800/40" : ""}`}
               >
                 <span className="h-2 w-2 rounded-full shrink-0" style={{ backgroundColor: ws.color }} />
-                <span className="text-[11px] font-medium text-slate-300 w-36 truncate shrink-0">
+                <span className="text-[11px] font-medium text-slate-300 w-24 md:w-36 truncate shrink-0">
                   {WORKSTREAM_KEYS[ws.name] ? t(WORKSTREAM_KEYS[ws.name]) : ws.name}
                 </span>
                 <div className="flex-1 h-1.5 rounded-full bg-[#171f32] overflow-hidden">

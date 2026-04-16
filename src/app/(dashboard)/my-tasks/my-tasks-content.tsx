@@ -159,7 +159,7 @@ export function OverdueCard({ task }: { task: TaskData }) {
       <TaskCode code={task.taskCode} />
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 flex-wrap">
-          <p className="text-lg text-blue-100 truncate">{task.title}</p>
+          <p className="text-lg text-blue-100 line-clamp-2">{task.title}</p>
 
         </div>
         <div className="flex items-center gap-3 mt-1">
@@ -187,7 +187,7 @@ export function WeekCard({ task }: { task: TaskData }) {
       <TaskCode code={task.taskCode} />
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 flex-wrap">
-          <p className="text-lg text-blue-100 truncate">{task.title}</p>
+          <p className="text-lg text-blue-100 line-clamp-2">{task.title}</p>
 
           <PriorityBadge priority={task.priority} />
         </div>
@@ -216,7 +216,7 @@ function LaterCard({ task }: { task: TaskData }) {
       <TaskCode code={task.taskCode} />
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 flex-wrap">
-          <p className="text-sm text-slate-300 truncate">{task.title}</p>
+          <p className="text-sm text-slate-300 line-clamp-2">{task.title}</p>
 
         </div>
         <div className="flex items-center gap-3 mt-1">
@@ -239,7 +239,7 @@ function CompletedCard({ task }: { task: TaskData }) {
       <div className="absolute left-0 top-0 bottom-0 w-1 rounded-l-lg bg-emerald-600/50" />
       <TaskCode code={task.taskCode} />
       <div className="flex-1 min-w-0">
-        <p className="text-sm text-slate-500 line-through truncate">{task.title}</p>
+        <p className="text-sm text-slate-500 line-through line-clamp-2">{task.title}</p>
       </div>
       <span className="material-symbols-outlined text-emerald-600 text-lg">check_circle</span>
     </div>

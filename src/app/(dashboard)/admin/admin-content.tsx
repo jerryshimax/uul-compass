@@ -214,6 +214,7 @@ function AiUsageSection({ rows }: { rows: AiUsageRow[] }) {
         </div>
       ) : (
         <div className="bg-slate-900/60 border border-slate-800/60 rounded-xl overflow-hidden">
+          <div className="overflow-x-auto">
           <table className="w-full text-xs">
             <thead>
               <tr className="border-b border-slate-800">
@@ -238,6 +239,7 @@ function AiUsageSection({ rows }: { rows: AiUsageRow[] }) {
               ))}
             </tbody>
           </table>
+          </div>
         </div>
       )}
     </div>
