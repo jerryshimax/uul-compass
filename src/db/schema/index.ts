@@ -22,6 +22,10 @@ export * from "./sales";
 export * from "./demand";
 export * from "./contracts";
 
+// ─── Strategic context layer (v2: customers + projects) ───────
+export * from "./customers";
+export * from "./projects";
+
 // ─── Ops surfaces ──────────────────────────────────────────────
 export * from "./office-status";
 export * from "./feedback";

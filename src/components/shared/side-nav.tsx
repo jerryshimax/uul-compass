@@ -29,9 +29,12 @@ export function SideNav({ user, isOpen = false, onClose }: { user: UserProps; is
     { labelKey: "nav_plan" as const, icon: "event_note", href: "/plan" },
     { labelKey: "nav_decisions" as const, icon: "gavel", href: "/decisions" },
     { labelKey: "nav_growth" as const, icon: "insights", href: "/value-gains" },
+    { labelKey: "nav_customers" as const, icon: "groups", href: "/customers" },
+    { labelKey: "nav_projects" as const, icon: "account_tree", href: "/projects" },
     { labelKey: "nav_sales" as const, icon: "storefront", href: "/sales" },
     { labelKey: "nav_risks" as const, icon: "warning", href: "/risks" },
     { labelKey: "nav_organization" as const, icon: "corporate_fare", href: "/settings" },
+    { labelKey: "nav_admin" as const, icon: "admin_panel_settings", href: "/admin/ai-cost" },
   ];
 
   const myTasksActive = pathname.startsWith("/my-tasks");
